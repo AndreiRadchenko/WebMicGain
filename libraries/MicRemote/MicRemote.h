@@ -7,13 +7,12 @@
 //configuring all used ports pins for output DDxn = 1
 void Set_pin_out()
 {
-
 	DDRF = DDRF | 0b11111111;
 	DDRK = DDRK | 0b01111111;
-	DDRE = DDRE | 0b00111011;
+	//DDRE = DDRE | 0b00111011;
 	DDRB = DDRB | 0b11100000;
 	DDRH = DDRH | 0b01100011;
-	DDRD = DDRD | 0b10000111;
+	DDRD = DDRD | 0b10000000;
 	DDRA = DDRA | 0b11111111;
 	DDRC = DDRC | 0b11111111;
 	DDRG = DDRG | 0b00000111;
@@ -22,10 +21,10 @@ void Set_pin_out()
 
 	PORTF &= 0b00000000;
 	PORTK &= 0b10000000;
-	PORTE &= 0b11000100;
+	//PORTE &= 0b11000100;
 	PORTB &= 0b00011111;
 	PORTH &= 0b10011100;
-	PORTD &= 0b01111000;
+	PORTD &= 0b01111111;
 	PORTA &= 0b00000000;
 	PORTC &= 0b00000000;
 	PORTG &= 0b11111000;
@@ -73,6 +72,8 @@ void CCU3_out(unsigned char ch4out)
 }
 
 //CCU4 is connected to E3, E4, E5 - cont2, cont1, cont0; E0, E1 - mic1, mic2
+//port not used in 10 chanel variant
+/*
 void CCU4_out(unsigned char ch4out)
 {
 
@@ -92,6 +93,7 @@ void CCU4_out(unsigned char ch4out)
 	PORTE = pe;
 	
 }
+*/
 
 //CCU5 is connected to B5, B6, B7 - cont2, cont1, cont0; H5, H6 - mic1, mic2
 void CCU5_out(unsigned char ch4out)
@@ -110,6 +112,8 @@ void CCU5_out(unsigned char ch4out)
 }
 
 //CCU6 is connected to D0, D1, D2 - cont2, cont1, cont0; H0, H1 - mic1, mic2
+//port not used in 10 chanel variant
+/*
 void CCU6_out(unsigned char ch4out)
 {
 
@@ -124,6 +128,7 @@ void CCU6_out(unsigned char ch4out)
 	PORTH = ph;
 
 }
+*/
 
 //CCU7 is connected to A0, A1, A2 - cont2, cont1, cont0; A3, A4 - mic1, mic2
 void CCU7_out(unsigned char ch4out)
@@ -189,7 +194,8 @@ void CCU10_out(unsigned char ch4out)
 }
 
 //CCU11 is connected to L3, L4, L5 - cont2, cont1, cont0; L6, L7 - mic1, mic2
-void CCU11_out(unsigned char ch4out)
+void CCU4_out(unsigned char ch4out)
+//port renamed to CCU4_out in 10 chanel variant
 {
 
 	char pl = PORTL;
@@ -200,7 +206,8 @@ void CCU11_out(unsigned char ch4out)
 }
 
 //CCU12 is connected to L0, L1, L2 - cont2, cont1, cont0; J0, J1 - mic1, mic2
-void CCU12_out(unsigned char ch4out)
+void CCU6_out(unsigned char ch4out)
+//port renamed to CCU5_out in 10 chanel variant
 {
 
 	char pl = PORTL;

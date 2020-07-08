@@ -82,7 +82,7 @@ For more informations about EEPROMAnything.h look at http://playground.arduino.c
 #include <EEPROM.h>
 #include "EEPROMAnything.h"
 
-//#define RESET_PIN 40	//Connect a button to this PIN. If the button is hold, an the device is turned on the default ethernet settings are restored.
+#define RESET_PIN 5	//Connect a button to this PIN. If the button is hold, an the device is turned on the default ethernet settings are restored.
 
 /* structure which is stored in the eeprom. 
 * Look at "EEPROMAnything.h" for the functions storing and reading the struct
@@ -163,14 +163,13 @@ void set_EEPROM_Default() {
 * - Check if a config is stored or the reset button is pressed. If one of the conditions is ture, set the defaults
 */
 void read_EEPROM_Settings() {
-  pinMode(RESET_PIN, INPUT);
-  digitalWrite(RESET_PIN, HIGH);
+
   
   // read the current config
   EEPROM_readAnything(0, eeprom_config);
   
   // check if config is present or if reset button is pressed
-  if (eeprom_config.config_set != 1) || digitalRead(RESET_PIN) == LOW) 
+  if ((eeprom_config.config_set != 1) || (digitalRead(RESET_PIN) == LOW)) 
   {
     // set default values
     set_EEPROM_Default();

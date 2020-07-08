@@ -504,7 +504,7 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   mic1 = cfg.ccu_ch[19-1];
                   gain_change_ccu(CCU10_out, mic1, mic2);
                   break;     
- 
+             /*
              case 111:
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[21-1] = mic1;
@@ -530,7 +530,7 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   mic1 = cfg.ccu_ch[23-1];
                   gain_change_ccu(CCU12_out, mic1, mic2);
                   break;                      
-                    
+            */        
             default:
                   break;
           };
@@ -689,7 +689,7 @@ void read_mic_settings()
   EEPROM_readAnything(EEPROM_SET, cfg);
   
   // check if config is present or if reset button is pressed
-  if (cfg.mic_config_set != 1)// || digitalRead(RESET_PIN) == LOW) 
+  if ((cfg.mic_config_set != 1) || (digitalRead(RESET_PIN) == LOW)) 
   {
     // set default values
     set_mic_default();   
@@ -700,6 +700,9 @@ void read_mic_settings()
 
 void setup()
 {
+  pinMode(RESET_PIN, INPUT);
+  digitalWrite(RESET_PIN, HIGH);
+
   Serial.begin(SERIAL_BAUD);
   delay(200); // some time to settle
   // set pins for digital outputs
@@ -721,15 +724,15 @@ void setup()
   gain_change_ccu(CCU8_out, cfg.ccu_ch[14], cfg.ccu_ch[15]);
   gain_change_ccu(CCU9_out, cfg.ccu_ch[16], cfg.ccu_ch[17]);
   gain_change_ccu(CCU10_out, cfg.ccu_ch[18], cfg.ccu_ch[19]);
-  gain_change_ccu(CCU11_out, cfg.ccu_ch[20], cfg.ccu_ch[21]);
-  gain_change_ccu(CCU12_out, cfg.ccu_ch[22], cfg.ccu_ch[23]);
+  //gain_change_ccu(CCU11_out, cfg.ccu_ch[20], cfg.ccu_ch[21]);
+  //gain_change_ccu(CCU12_out, cfg.ccu_ch[22], cfg.ccu_ch[23]);
   
   /* initialize the Ethernet adapter with the settings from eeprom */
 
   setupNetwork();
 
   // start the Ethernet connection and the server:
-  Ethernet.begin(mac, ip);
+  Ethernet.begin(eeprom_config.mac, eeprom_config.ip);
   
   delay(200); // some time to settle
   webserver = new WebServer(PREFIX, eeprom_config.webserverPort);
