@@ -35,10 +35,10 @@ inline Print &operator <<(Print &obj, T arg)
 
 
 // CHANGE THIS TO YOUR OWN UNIQUE VALUE
-static uint8_t mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+static uint8_t mac[] = { 0xDE, 0xAD, 0xBE, 0x11, 0xFE, 0xED };
 
 // CHANGE THIS TO MATCH YOUR HOST NETWORK
-static uint8_t ip[] = { 192, 168, 1, 1 };
+static uint8_t ip[] = { 192, 168, 32, 111 };
 
 #define PREFIX ""
 //WebServer webserver(PREFIX, 80);
@@ -700,6 +700,7 @@ void read_mic_settings()
 
 void setup()
 {
+  Serial.begin(SERIAL_BAUD);
   delay(200); // some time to settle
   // set pins for digital outputs
   Set_pin_out();
@@ -726,6 +727,10 @@ void setup()
   /* initialize the Ethernet adapter with the settings from eeprom */
 
   setupNetwork();
+
+  // start the Ethernet connection and the server:
+  Ethernet.begin(mac, ip);
+  
   delay(200); // some time to settle
   webserver = new WebServer(PREFIX, eeprom_config.webserverPort);
   

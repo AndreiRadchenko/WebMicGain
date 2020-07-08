@@ -64,7 +64,7 @@ For more informations about EEPROMAnything.h look at http://playground.arduino.c
 
 
 #define WEBDUINO_FAVICON_DATA "" // no favicon
-//#define DEBUG  //uncomment for serial debug output
+#define DEBUG  //uncomment for serial debug output
 #define USE_SYSTEM_LIBRARY //comment out if you want to save some space (about 1 Byte). You wouldn't see uptime and free RAM if it's commented out.
 #define SERIAL_BAUD 9600
 
@@ -123,13 +123,13 @@ void set_EEPROM_Default() {
     // set the default IP address for the arduino. In this case its 192.168.0.111
     eeprom_config.ip[0]=192;
     eeprom_config.ip[1]=168;
-    eeprom_config.ip[2]=1;
+    eeprom_config.ip[2]=32;
     eeprom_config.ip[3]=111;
   
     // set the default GATEWAY. In this case its 192.168.0.254
     eeprom_config.gateway[0]=192;
     eeprom_config.gateway[1]=168;
-    eeprom_config.gateway[2]=1;
+    eeprom_config.gateway[2]=32;
     eeprom_config.gateway[3]=254;
     
     // set the default SUBNET. In this case its 255.255.255.0
@@ -141,7 +141,7 @@ void set_EEPROM_Default() {
     // set the default DNS SERVER. In this case its 192.168.0.254
     eeprom_config.dns_server[0]=192;
     eeprom_config.dns_server[1]=168;
-    eeprom_config.dns_server[2]=1;
+    eeprom_config.dns_server[2]=32;
     eeprom_config.dns_server[3]=254;
 
     // set the default Webserver Port. In this case its Port 80
@@ -163,14 +163,14 @@ void set_EEPROM_Default() {
 * - Check if a config is stored or the reset button is pressed. If one of the conditions is ture, set the defaults
 */
 void read_EEPROM_Settings() {
-//  pinMode(RESET_PIN, INPUT);
-//  digitalWrite(RESET_PIN, HIGH);
+  pinMode(RESET_PIN, INPUT);
+  digitalWrite(RESET_PIN, HIGH);
   
   // read the current config
   EEPROM_readAnything(0, eeprom_config);
   
   // check if config is present or if reset button is pressed
-  if (eeprom_config.config_set != 1)// || digitalRead(RESET_PIN) == LOW) 
+  if (eeprom_config.config_set != 1) || digitalRead(RESET_PIN) == LOW) 
   {
     // set default values
     set_EEPROM_Default();
