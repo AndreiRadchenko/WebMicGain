@@ -6,7 +6,7 @@
 //#include <System.h>
 //#include <MyNetSetup.h>
 
-#include <TFT.h>
+//#include <TFT.h>
 
 
 /*

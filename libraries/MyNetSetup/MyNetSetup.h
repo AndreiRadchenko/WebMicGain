@@ -63,7 +63,7 @@ For more informations about EEPROMAnything.h look at http://playground.arduino.c
 */
 
 
-#define WEBDUINO_FAVICON_DATA "" // no favicon
+//#define WEBDUINO_FAVICON_DATA "" // no favicon
 #define DEBUG  //uncomment for serial debug output
 #define USE_SYSTEM_LIBRARY //comment out if you want to save some space (about 1 Byte). You wouldn't see uptime and free RAM if it's commented out.
 #define SERIAL_BAUD 9600
@@ -367,7 +367,7 @@ P(table_td_start) = "<td>";
 P(table_td_end) = "</td>";
 P(table_end) = "</table>";
 
-P(Config_set) = "<font size=\"6\" color=\"red\">New configuration stored! <br>Please turn off and on your Arduino or use the reset button!</font><br>";
+P(Config_set) = "<font size=\"6\" color=\"red\">New configuration stored! <br>Please turn off and on mic control unit!</font><br>";
 
 P(DHCP_STATE_TIME) = "DHCP last renew timestamp (sec)";
 P(DHCP_STATE) = "DHCP renew return code (sec)";
@@ -446,12 +446,12 @@ void setupNetHTML(WebServer &server, WebServer::ConnectionType type, char *url_t
         // debug output for parameters
         #ifdef DEBUG
         Serial.print(name);
-        server.print(name);
+        //server.print(name);
         Serial.print(" - "); 
-        server.print(" - ");
+        //server.print(" - ");
         Serial.println(value);
-        server.print(value);
-        server.print("<br>");
+        //server.print(value);
+        //server.print("<br>");
         #endif
         
         
