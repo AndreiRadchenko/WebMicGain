@@ -49,8 +49,8 @@ WebServer * webserver;
 struct config_mic
 {
 byte mic_config_set;
-unsigned char ccu_ch[24]; // global array for saving gain value
-char ccu_name[12][16];    //string array for ccu names. names length is 16 char
+unsigned char ccu_ch[32]; // global array for saving gain value
+char ccu_name[16][16];    //string array for ccu names. names length is 16 char
 } cfg;
 
 //byte mic_config_set;
@@ -212,9 +212,10 @@ void outputPins(WebServer &server, WebServer::ConnectionType type, bool addContr
         server << "<select name='" <<"s062"<< "' onchange=\"send_param('s062', document.form1.s062.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[11]);        
        	server << "</select> </p>";
-   server << "</td> </tr> <p> <br> </p>";
-   
-   server << "<tr>";
+   //server << "</td> </tr> <p> <br> </p>";
+   server << "</td>";
+
+   //server << "<tr>";
     
    server << "<td>";
    server << "<p align=right>";// <<  "CCU7" << "<br> </p>";
@@ -244,8 +245,10 @@ void outputPins(WebServer &server, WebServer::ConnectionType type, bool addContr
         server << "<select name='" <<"s082"<< "' onchange=\"send_param('s082', document.form1.s082.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[15]);        
        	server << "</select> </p>";
-   server << "</td>";
-    
+   server << "</td> </tr> <p> <br> </p>";
+
+   server << "<tr>";
+
    server << "<td>";
    server << "<p align=right>";// <<  "CCU9" << "<br> </p>";
    server << "<input type='text' style='background-color:Khaki;' name='ccu09' maxlength='11' size='11' value='" << cfg.ccu_name[8] << "' onchange=\"send_name('ccu09', document.form1.ccu09.value)\">";
@@ -304,7 +307,67 @@ void outputPins(WebServer &server, WebServer::ConnectionType type, bool addContr
         server << "<select name='" <<"s122"<< "' onchange=\"send_param('s122', document.form1.s122.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[23]);        
        	server << "</select> </p>";
-   server << "</td>";   
+   server << "</td>";
+
+   server << "<td>";
+   server << "<p align=right>";// <<  "CCU13" << "<br> </p>";
+   server << "<input type='text' style='background-color:Khaki;' name='ccu13' maxlength='11' size='11' value='" << cfg.ccu_name[12] << "' onchange=\"send_name('ccu13', document.form1.ccu13.value)\">";
+   server << "<br> </p>";
+        server << "<p>" << "CH1 ";
+        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
+        server << "<select name='" <<"s131"<< "' onchange=\"send_param('s131', document.form1.s131.selectedIndex)\">";
+        selectedOptions(server, cfg.ccu_ch[24]);     
+       	server << "</select> </p>";
+        server << "<p>" << "CH2 ";
+        server << "<select name='" <<"s132"<< "' onchange=\"send_param('s132', document.form1.s132.selectedIndex)\">";
+        selectedOptions(server, cfg.ccu_ch[25]);        
+       	server << "</select> </p>";
+   server << "</td>";
+
+   server << "<td>";
+   server << "<p align=right>";// <<  "CCU14" << "<br> </p>";
+   server << "<input type='text' style='background-color:Khaki;' name='ccu14' maxlength='11' size='11' value='" << cfg.ccu_name[13] << "' onchange=\"send_name('ccu14', document.form1.ccu14.value)\">";
+   server << "<br> </p>";
+        server << "<p>" << "CH1 ";
+        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
+        server << "<select name='" <<"s141"<< "' onchange=\"send_param('s141', document.form1.s141.selectedIndex)\">";
+        selectedOptions(server, cfg.ccu_ch[26]);     
+       	server << "</select> </p>";
+        server << "<p>" << "CH2 ";
+        server << "<select name='" <<"s142"<< "' onchange=\"send_param('s142', document.form1.s142.selectedIndex)\">";
+        selectedOptions(server, cfg.ccu_ch[27]);        
+       	server << "</select> </p>";
+   server << "</td>";
+
+   server << "<td>";
+   server << "<p align=right>";// <<  "CCU15" << "<br> </p>";
+   server << "<input type='text' style='background-color:Khaki;' name='ccu15' maxlength='11' size='11' value='" << cfg.ccu_name[14] << "' onchange=\"send_name('ccu15', document.form1.ccu15.value)\">";
+   server << "<br> </p>";
+        server << "<p>" << "CH1 ";
+        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
+        server << "<select name='" <<"s151"<< "' onchange=\"send_param('s151', document.form1.s151.selectedIndex)\">";
+        selectedOptions(server, cfg.ccu_ch[28]);     
+       	server << "</select> </p>";
+        server << "<p>" << "CH2 ";
+        server << "<select name='" <<"s142"<< "' onchange=\"send_param('s152', document.form1.s152.selectedIndex)\">";
+        selectedOptions(server, cfg.ccu_ch[29]);        
+       	server << "</select> </p>";
+   server << "</td>";  
+
+   server << "<td>";
+   server << "<p align=right>";// <<  "CCU16" << "<br> </p>";
+   server << "<input type='text' style='background-color:Khaki;' name='ccu16' maxlength='11' size='11' value='" << cfg.ccu_name[15] << "' onchange=\"send_name('ccu16', document.form1.ccu16.value)\">";
+   server << "<br> </p>";
+        server << "<p>" << "CH1 ";
+        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
+        server << "<select name='" <<"s161"<< "' onchange=\"send_param('s161', document.form1.s161.selectedIndex)\">";
+        selectedOptions(server, cfg.ccu_ch[30]);     
+       	server << "</select> </p>";
+        server << "<p>" << "CH2 ";
+        server << "<select name='" <<"s162"<< "' onchange=\"send_param('s162', document.form1.s162.selectedIndex)\">";
+        selectedOptions(server, cfg.ccu_ch[31]);        
+       	server << "</select> </p>";
+   server << "</td>";      
   //for (i=1; i<=12; i++)
 
   server << "</tr>";
@@ -503,34 +566,86 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   cfg.ccu_ch[20-1] = mic2;
                   mic1 = cfg.ccu_ch[19-1];
                   gain_change_ccu(CCU10_out, mic1, mic2);
-                  break;     
-             /*
+                  break;  
+
              case 111:
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[21-1] = mic1;
                   mic2 = cfg.ccu_ch[22-1];
-                  gain_change_ccu(CCU11_out, mic1, mic2);
+//todo: define CCU11_out for i2c connected mega //gain_change_ccu(CCU11_out, mic1, mic2);
                   break;
             case 112:
                   mic2 = (char) strtoul(value, NULL, 10);
                   cfg.ccu_ch[22-1] = mic2;
                   mic1 = cfg.ccu_ch[21-1];
-                  gain_change_ccu(CCU11_out, mic1, mic2);
+                  //gain_change_ccu(CCU11_out, mic1, mic2);
                   break; 
  
-             case 121:
+            case 121:
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[23-1] = mic1;
                   mic2 = cfg.ccu_ch[24-1];
-                  gain_change_ccu(CCU12_out, mic1, mic2);
+//todo: define CCU12_out for i2c connected mega //gain_change_ccu(CCU12_out, mic1, mic2);
                   break;
             case 122:
                   mic2 = (char) strtoul(value, NULL, 10);
                   cfg.ccu_ch[24-1] = mic2;
                   mic1 = cfg.ccu_ch[23-1];
-                  gain_change_ccu(CCU12_out, mic1, mic2);
-                  break;                      
-            */        
+                  //gain_change_ccu(CCU12_out, mic1, mic2);
+                  break;
+
+            case 131:
+                  mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
+                  cfg.ccu_ch[25-1] = mic1;
+                  mic2 = cfg.ccu_ch[26-1];
+//todo: define CCU13_out for i2c connected mega //gain_change_ccu(CCU13_out, mic1, mic2);
+                  break;
+            case 132:
+                  mic2 = (char) strtoul(value, NULL, 10);
+                  cfg.ccu_ch[26-1] = mic2;
+                  mic1 = cfg.ccu_ch[25-1];
+                  //gain_change_ccu(CCU13_out, mic1, mic2);
+                  break; 
+
+            case 141:
+                  mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
+                  cfg.ccu_ch[27-1] = mic1;
+                  mic2 = cfg.ccu_ch[28-1];
+//todo: define CCU14_out for i2c connected mega //gain_change_ccu(CCU14_out, mic1, mic2);
+                  break;
+            case 142:
+                  mic2 = (char) strtoul(value, NULL, 10);
+                  cfg.ccu_ch[28-1] = mic2;
+                  mic1 = cfg.ccu_ch[27-1];
+                  //gain_change_ccu(CCU14_out, mic1, mic2);
+                  break;
+
+            case 151:
+                  mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
+                  cfg.ccu_ch[29-1] = mic1;
+                  mic2 = cfg.ccu_ch[30-1];
+//todo: define CCU15_out for i2c connected mega //gain_change_ccu(CCU15_out, mic1, mic2);
+                  break;
+            case 152:
+                  mic2 = (char) strtoul(value, NULL, 10);
+                  cfg.ccu_ch[30-1] = mic2;
+                  mic1 = cfg.ccu_ch[29-1];
+                  //gain_change_ccu(CCU15_out, mic1, mic2);
+                  break;
+
+            case 161:
+                  mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
+                  cfg.ccu_ch[31-1] = mic1;
+                  mic2 = cfg.ccu_ch[32-1];
+//todo: define CCU16_out for i2c connected mega //gain_change_ccu(CCU16_out, mic1, mic2);
+                  break;
+            case 162:
+                  mic2 = (char) strtoul(value, NULL, 10);
+                  cfg.ccu_ch[32-1] = mic2;
+                  mic1 = cfg.ccu_ch[31-1];
+                  //gain_change_ccu(CCU16_out, mic1, mic2);
+                  break;                                              
+                   
             default:
                   break;
           };
@@ -605,6 +720,18 @@ void ccuNameCmd(WebServer &server, WebServer::ConnectionType type, char *url_tai
             case 12:
                   strcpy(cfg.ccu_name[11], value); //save changed ccu name to global array ccu_name[12][16] 
                   break;
+            case 13:
+                  strcpy(cfg.ccu_name[12], value); //save changed ccu name to global array ccu_name[16][16] 
+                  break;
+            case 14:
+                  strcpy(cfg.ccu_name[13], value); //save changed ccu name to global array ccu_name[16][16] 
+                  break;
+            case 15:
+                  strcpy(cfg.ccu_name[14], value); //save changed ccu name to global array ccu_name[16][16] 
+                  break;
+            case 16:
+                  strcpy(cfg.ccu_name[15], value); //save changed ccu name to global array ccu_name[16][16] 
+                  break;                          
             default:
                   break;
           };
@@ -662,14 +789,14 @@ void set_mic_default()
   
   cfg.mic_config_set = 1; // dont change! It's used to check if the config is already set
   
-  for (j = 0; j <= 12; j++)
+  for (j = 0; j <= 15; j++)
   {
     strcpy(cfg.ccu_name[j], "CCU");
     num = itoa(j+1,buf,10);
     strcat(cfg.ccu_name[j], num);
   }; 
   // global unsigned char ccu_ch[24];
-  for (i = 0; i <= 23; i++)
+  for (i = 0; i <= 31; i++)
   {
     cfg.ccu_ch[i] = 2; //-40dB потом инициализация будет значениями из EEPROM
   };
