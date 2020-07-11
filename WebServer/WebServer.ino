@@ -1,26 +1,7 @@
-//#include <SPI.h>
-//#include <EEPROM.h>
-//#include <WebServer.h>
-//#include <NetSetup.h>
-//#include <EEPROMAnything.h>
-//#include <System.h>
-//#include <MyNetSetup.h>
-
-//#include <TFT.h>
-
-
-/*
-
- */
-
-//#include "SPI.h"
-//#include "Ethernet.h"
-//#include "WebServer.h"
 #include "MicRemote.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "MyNetSetup.h"
-//#include <EEPROM.h>
 
 #define EEPROM_ETHER 0
 #define EEPROM_SET 50
@@ -35,10 +16,10 @@ inline Print &operator <<(Print &obj, T arg)
 
 
 // CHANGE THIS TO YOUR OWN UNIQUE VALUE
-static uint8_t mac[] = { 0xDE, 0xAD, 0xBE, 0x11, 0xFE, 0xED };
+//static uint8_t mac[] = { 0xDE, 0xAD, 0xBE, 0x11, 0xFE, 0xED };
 
 // CHANGE THIS TO MATCH YOUR HOST NETWORK
-static uint8_t ip[] = { 192, 168, 32, 111 };
+//static uint8_t ip[] = { 192, 168, 32, 111 };
 
 #define PREFIX ""
 //WebServer webserver(PREFIX, 80);
@@ -59,6 +40,23 @@ char ccu_name[16][16];    //string array for ccu names. names length is 16 char
 char ccu;
 char mic1;
 char mic2;
+
+//move web page code to programm memory
+//P(Http400) = "HTTP 400 - BAD REQUEST";
+//server.printP(table_tr_end);
+/*
+P(br) = "<br>\n";
+P(table_start) = "<table>";
+P(table_tr_start) = "<tr>";
+P(table_tr_end) = "</tr>";
+P(table_td_start) = "<td>";
+P(table_td_end) = "</td>";
+P(table_end) = "</table>"; 
+*/
+P(ccu_table_td_start) = "<td> <p align=right> <input type='text' style='background-color:Khaki;'";
+P(ccu_table_td_end) = "</select> </p> </td>";
+P(ccu_ch1) = "<br> </p> <p> CH1 <select name='";
+P(ccu_ch2) = "</select> </p> <p> CH2 <select name='";
 
 // commands are functions that get called by the webserver framework
 // they can read any posted data from client, and they output to server
@@ -111,134 +109,104 @@ void outputPins(WebServer &server, WebServer::ConnectionType type, bool addContr
   int k;
   char ccu_ch_name[4];
 
-//    server << "<h1 align='right'>Sony cameras remout mic control</h1>";
-//    server << "<table border='1' bgcolor='white' align='right' bordercolor='black' cellpadding='10'>";
     server << "<h1>Sony cameras remout mic control</h1>";
     server << "<table border='1' bgcolor='white' bordercolor='black' cellpadding='10'>";
     server << "<tr>";
-//    server << "<form action='" PREFIX "/form' method='POST' name='form1'>";
     server << "<form action='' method='POST' name='form1'>";
 
-    server << "<td>";
-    server << "<p align=right>";// <<  "CCU1" << "<br> </p>";
-    server << "<input type='text' style='background-color:Khaki;' name='ccu01' maxlength='11' size='11' value='" << cfg.ccu_name[0] << "' onchange=\"send_name('ccu01', document.form1.ccu01.value)\">";
-    server << "<br> </p>";
-        server << "<p>"<< "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s011"<< "' onchange=\"send_param('s011', document.form1.s011.selectedIndex)\">"; 
+    //"CCU1"
+    server.printP(ccu_table_td_start);
+    server << "name='ccu01' maxlength='11' size='11' value='" << cfg.ccu_name[0] << "' onchange=\"send_name('ccu01', document.form1.ccu01.value)\">";
+        server.printP(ccu_ch1);    
+        server <<"s011"<< "' onchange=\"send_param('s011', document.form1.s011.selectedIndex)\">"; 
         selectedOptions(server, cfg.ccu_ch[0]);  //output select list with previous selected options 
-//      server << "<option>- 20 dB</option>";  
-//	server << "<option>- 30 dB</option>";
-//	server << "<option>- 40 dB</option>";
-//	server << "<option>- 50 dB</option>";
-//	server << "<option>- 60 dB</option>";        
-       	server << "</select> </p>";
-        server << "<p>" << "CH2 ";
-        server << "<select name='" <<"s012"<< "' onchange=\"send_param('s012', document.form1.s012.selectedIndex)\">";
+        server.printP(ccu_ch2);
+        server <<"s012"<< "' onchange=\"send_param('s012', document.form1.s012.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[1]);          
-       	server << "</select> </p>";
-   server << "</td>";  
+       	//server << "</select> </p>"; 
+    server.printP(ccu_table_td_end);
    
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU2" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu02' maxlength='11' size='11' value='" << cfg.ccu_name[1] << "' onchange=\"send_name('ccu02', document.form1.ccu02.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s021"<< "' onchange=\"send_param('s021', document.form1.s021.selectedIndex)\">";
+   //"CCU2"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu02' maxlength='11' size='11' value='" << cfg.ccu_name[1] << "' onchange=\"send_name('ccu02', document.form1.ccu02.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s021"<< "' onchange=\"send_param('s021', document.form1.s021.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[2]);        
-       	server << "</select> </p>";
-        server << "<p>" << "CH2 ";
-        server << "<select name='" <<"s022"<< "' onchange=\"send_param('s022', document.form1.s022.selectedIndex)\">";
+        server.printP(ccu_ch2);
+        server <<"s022"<< "' onchange=\"send_param('s022', document.form1.s022.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[3]);        
-       	server << "</select> </p>";
-   server << "</td>";    
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);    
    
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU3" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu03' maxlength='11' size='11' value='" << cfg.ccu_name[2] << "' onchange=\"send_name('ccu03', document.form1.ccu03.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s031"<< "' onchange=\"send_param('s031', document.form1.s031.selectedIndex)\">";
+   //"CCU3"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu03' maxlength='11' size='11' value='" << cfg.ccu_name[2] << "' onchange=\"send_name('ccu03', document.form1.ccu03.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s031"<< "' onchange=\"send_param('s031', document.form1.s031.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[4]);        
-       	server << "</select> </p>";
-        server << "<p>" << "CH2 ";
-        server << "<select name='" <<"s032"<< "' onchange=\"send_param('s032', document.form1.s032.selectedIndex)\">";
+        server.printP(ccu_ch2);
+        server <<"s032"<< "' onchange=\"send_param('s032', document.form1.s032.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[5]);        
-       	server << "</select> </p>";
-   server << "</td>";
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);
    
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU4" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu04' maxlength='11' size='11' value='" << cfg.ccu_name[3] << "' onchange=\"send_name('ccu04', document.form1.ccu04.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s041"<< "' onchange=\"send_param('s041', document.form1.s041.selectedIndex)\">";
+   //"CCU4"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu04' maxlength='11' size='11' value='" << cfg.ccu_name[3] << "' onchange=\"send_name('ccu04', document.form1.ccu04.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s041"<< "' onchange=\"send_param('s041', document.form1.s041.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[6]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
         server << "<select name='" <<"s042"<< "' onchange=\"send_param('s042', document.form1.s042.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[7]);        
-       	server << "</select> </p>";
-   server << "</td>";
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);
    
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU5" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu05' maxlength='11' size='11' value='" << cfg.ccu_name[4] << "' onchange=\"send_name('ccu05', document.form1.ccu05.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s051"<< "' onchange=\"send_param('s051', document.form1.s051.selectedIndex)\">";
+   //"CCU5"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu05' maxlength='11' size='11' value='" << cfg.ccu_name[4] << "' onchange=\"send_name('ccu05', document.form1.ccu05.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s051"<< "' onchange=\"send_param('s051', document.form1.s051.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[8]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
         server << "<select name='" <<"s052"<< "' onchange=\"send_param('s052', document.form1.s052.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[9]);        
-       	server << "</select> </p>";
-   server << "</td>";   
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);   
     
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU6" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu06' maxlength='11' size='11' value='" << cfg.ccu_name[5] << "' onchange=\"send_name('ccu06', document.form1.ccu06.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s061"<< "' onchange=\"send_param('s061', document.form1.s061.selectedIndex)\">";
+   //"CCU6"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu06' maxlength='11' size='11' value='" << cfg.ccu_name[5] << "' onchange=\"send_name('ccu06', document.form1.ccu06.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s061"<< "' onchange=\"send_param('s061', document.form1.s061.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[10]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
         server << "<select name='" <<"s062"<< "' onchange=\"send_param('s062', document.form1.s062.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[11]);        
-       	server << "</select> </p>";
-   //server << "</td> </tr> <p> <br> </p>";
-   server << "</td>";
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);
 
-   //server << "<tr>";
-    
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU7" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu07' maxlength='11' size='11' value='" << cfg.ccu_name[6] << "' onchange=\"send_name('ccu07', document.form1.ccu07.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
+   //"CCU7"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu07' maxlength='11' size='11' value='" << cfg.ccu_name[6] << "' onchange=\"send_name('ccu07', document.form1.ccu07.value)\">";
+        server.printP(ccu_ch1);
         server << "<select name='" <<"s071"<< "' onchange=\"send_param('s071', document.form1.s071.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[12]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
         server << "<select name='" <<"s072"<< "' onchange=\"send_param('s072', document.form1.s072.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[13]);        
-       	server << "</select> </p>";
-   server << "</td>";
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);
     
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU8" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu08' maxlength='11' size='11' value='" << cfg.ccu_name[7] << "' onchange=\"send_name('ccu08', document.form1.ccu08.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s081"<< "' onchange=\"send_param('s081', document.form1.s081.selectedIndex)\">";
+   //"CCU8"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu08' maxlength='11' size='11' value='" << cfg.ccu_name[7] << "' onchange=\"send_name('ccu08', document.form1.ccu08.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s081"<< "' onchange=\"send_param('s081', document.form1.s081.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[14]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
@@ -249,131 +217,112 @@ void outputPins(WebServer &server, WebServer::ConnectionType type, bool addContr
 
    server << "<tr>";
 
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU9" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu09' maxlength='11' size='11' value='" << cfg.ccu_name[8] << "' onchange=\"send_name('ccu09', document.form1.ccu09.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s091"<< "' onchange=\"send_param('s091', document.form1.s091.selectedIndex)\">";
+   //"CCU9"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu09' maxlength='11' size='11' value='" << cfg.ccu_name[8] << "' onchange=\"send_name('ccu09', document.form1.ccu09.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s091"<< "' onchange=\"send_param('s091', document.form1.s091.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[16]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
         server << "<select name='" <<"s092"<< "' onchange=\"send_param('s092', document.form1.s092.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[17]);        
-       	server << "</select> </p>";
-   server << "</td>"; 
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end); 
     
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU10" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu10' maxlength='11' size='11' value='" << cfg.ccu_name[9] << "' onchange=\"send_name('ccu10', document.form1.ccu10.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s101"<< "' onchange=\"send_param('s101', document.form1.s101.selectedIndex)\">";
+   //"CCU10"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu10' maxlength='11' size='11' value='" << cfg.ccu_name[9] << "' onchange=\"send_name('ccu10', document.form1.ccu10.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s101"<< "' onchange=\"send_param('s101', document.form1.s101.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[18]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
         server << "<select name='" <<"s102"<< "' onchange=\"send_param('s102', document.form1.s102.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[19]);        
-       	server << "</select> </p>";
-   server << "</td>";
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);
     
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU11" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu11' maxlength='11' size='11' value='" << cfg.ccu_name[10] << "' onchange=\"send_name('ccu11', document.form1.ccu11.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s111"<< "' onchange=\"send_param('s111', document.form1.s111.selectedIndex)\">";
+   //"CCU11"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu11' maxlength='11' size='11' value='" << cfg.ccu_name[10] << "' onchange=\"send_name('ccu11', document.form1.ccu11.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s111"<< "' onchange=\"send_param('s111', document.form1.s111.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[20]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
         server << "<select name='" <<"s112"<< "' onchange=\"send_param('s112', document.form1.s112.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[21]);        
-       	server << "</select> </p>";
-   server << "</td>";
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);
     
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU12" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu12' maxlength='11' size='11' value='" << cfg.ccu_name[11] << "' onchange=\"send_name('ccu12', document.form1.ccu12.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s121"<< "' onchange=\"send_param('s121', document.form1.s121.selectedIndex)\">";
+   //"CCU12"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu12' maxlength='11' size='11' value='" << cfg.ccu_name[11] << "' onchange=\"send_name('ccu12', document.form1.ccu12.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s121"<< "' onchange=\"send_param('s121', document.form1.s121.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[22]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
         server << "<select name='" <<"s122"<< "' onchange=\"send_param('s122', document.form1.s122.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[23]);        
-       	server << "</select> </p>";
-   server << "</td>";
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);
 
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU13" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu13' maxlength='11' size='11' value='" << cfg.ccu_name[12] << "' onchange=\"send_name('ccu13', document.form1.ccu13.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s131"<< "' onchange=\"send_param('s131', document.form1.s131.selectedIndex)\">";
+   //"CCU13"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu13' maxlength='11' size='11' value='" << cfg.ccu_name[12] << "' onchange=\"send_name('ccu13', document.form1.ccu13.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s131"<< "' onchange=\"send_param('s131', document.form1.s131.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[24]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
         server << "<select name='" <<"s132"<< "' onchange=\"send_param('s132', document.form1.s132.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[25]);        
-       	server << "</select> </p>";
-   server << "</td>";
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);
 
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU14" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu14' maxlength='11' size='11' value='" << cfg.ccu_name[13] << "' onchange=\"send_name('ccu14', document.form1.ccu14.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s141"<< "' onchange=\"send_param('s141', document.form1.s141.selectedIndex)\">";
+   // <<  "CCU14"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu14' maxlength='11' size='11' value='" << cfg.ccu_name[13] << "' onchange=\"send_name('ccu14', document.form1.ccu14.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s141"<< "' onchange=\"send_param('s141', document.form1.s141.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[26]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
         server << "<select name='" <<"s142"<< "' onchange=\"send_param('s142', document.form1.s142.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[27]);        
-       	server << "</select> </p>";
-   server << "</td>";
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);
 
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU15" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu15' maxlength='11' size='11' value='" << cfg.ccu_name[14] << "' onchange=\"send_name('ccu15', document.form1.ccu15.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s151"<< "' onchange=\"send_param('s151', document.form1.s151.selectedIndex)\">";
+   //"CCU15"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu15' maxlength='11' size='11' value='" << cfg.ccu_name[14] << "' onchange=\"send_name('ccu15', document.form1.ccu15.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s151"<< "' onchange=\"send_param('s151', document.form1.s151.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[28]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
-        server << "<select name='" <<"s142"<< "' onchange=\"send_param('s152', document.form1.s152.selectedIndex)\">";
+        server << "<select name='" <<"s152"<< "' onchange=\"send_param('s152', document.form1.s152.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[29]);        
-       	server << "</select> </p>";
-   server << "</td>";  
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);  
 
-   server << "<td>";
-   server << "<p align=right>";// <<  "CCU16" << "<br> </p>";
-   server << "<input type='text' style='background-color:Khaki;' name='ccu16' maxlength='11' size='11' value='" << cfg.ccu_name[15] << "' onchange=\"send_name('ccu16', document.form1.ccu16.value)\">";
-   server << "<br> </p>";
-        server << "<p>" << "CH1 ";
-        //server << " <select name='" <<ccu_ch<< "' onchange=\"javascript:window.alert ('" <<ccu_ch<< "'+' '+ document.form1." <<ccu_ch<< ".selectedIndex)\">";
-        server << "<select name='" <<"s161"<< "' onchange=\"send_param('s161', document.form1.s161.selectedIndex)\">";
+   //"CCU16"
+   server.printP(ccu_table_td_start);
+   server << "name='ccu16' maxlength='11' size='11' value='" << cfg.ccu_name[15] << "' onchange=\"send_name('ccu16', document.form1.ccu16.value)\">";
+        server.printP(ccu_ch1);
+        server <<"s161"<< "' onchange=\"send_param('s161', document.form1.s161.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[30]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
         server << "<select name='" <<"s162"<< "' onchange=\"send_param('s162', document.form1.s162.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[31]);        
-       	server << "</select> </p>";
-   server << "</td>";      
-  //for (i=1; i<=12; i++)
+       	//server << "</select> </p>";
+   server.printP(ccu_table_td_end);  
 
   server << "</tr>";
-//  server << "<p> <br> <a href=\"setupNet.html\">NETWORK SETUP</a> </p>";
   server << "</table>";// <p> <br> </p>";
-//  server << "<p> <input type='submit' name='button' value='Save Settings'  onClick=\"save_param()\"> </p>";
   server << "</form>";
   server << "<p> <br> <br> <br> <input type='submit' name='button' value='Save Settings'  onClick=\"save_param()\"> </p>";
   server << "<p> <br> <br> <br> <br> <br> <br> <br> <br> <a href=\"setupNet.html\">NETWORK SETUP</a> </p>";
@@ -464,7 +413,7 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   gain_change_ccu(CCU2_out, mic1, mic2);
                   break;                 
                   
-             case 31:
+            case 31:
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[5-1] = mic1;
                   mic2 = cfg.ccu_ch[6-1];
@@ -516,7 +465,7 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   gain_change_ccu(CCU6_out, mic1, mic2);
                   break; 
 
-             case 71:
+            case 71:
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[13-1] = mic1;
                   mic2 = cfg.ccu_ch[14-1];
@@ -529,7 +478,7 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   gain_change_ccu(CCU7_out, mic1, mic2);
                   break;
 
-             case 81:
+            case 81:
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[15-1] = mic1;
                   mic2 = cfg.ccu_ch[16-1];
@@ -555,7 +504,7 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   gain_change_ccu(CCU9_out, mic1, mic2);
                   break;     
  
-             case 101:
+            case 101:
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[19-1] = mic1;
                   mic2 = cfg.ccu_ch[20-1];
@@ -568,7 +517,7 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   gain_change_ccu(CCU10_out, mic1, mic2);
                   break;  
 
-             case 111:
+            case 111:
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[21-1] = mic1;
                   mic2 = cfg.ccu_ch[22-1];
@@ -649,7 +598,12 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
             default:
                   break;
           };
-
+        #ifdef DEBUG
+          Serial.print("ch_number - ");
+          Serial.println(ch_number);
+          Serial.print(" mic: ");
+          Serial.println(value);
+        #endif
 
       };
     } while (repeat);
@@ -749,30 +703,12 @@ void ccuNameCmd(WebServer &server, WebServer::ConnectionType type, char *url_tai
 
 void saveParamCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
 {  
-/*  if (type == WebServer::POST)
-    {    
-  
-      bool repeat;
-      char pname[16];
-      char value[16];
-      
-      do
-      {            
-        repeat = server.readPOSTparam(pname, 16, value, 16);  
-        if (repeat)
-         {
-         };
-      } while (repeat);        
- */       
      EEPROM_writeAnything(EEPROM_SET, cfg);
-//    }
 }
 
 void defaultCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
 {  
-
     outputPins(server, type, false);  
-
 }
 
 /** 
