@@ -1,6 +1,6 @@
 {
     "board": "arduino:avr:mega",
     "configuration": "cpu=atmega2560",
-    "port": "/dev/ttyACM0",
-    "sketch": "WebServerMicCtrl150904.ino"
+    "port": "/dev/ttyUSB1",
+    "sketch": "WebServer.ino"
 }

@@ -1,8 +1,17 @@
 #include <avr/io.h> 
 #include <util/delay.h>
+#include <Wire.h>
 
 #define NO_CTRL 0b00011111 //îòäàåì óïðàâëåíèå êàì. êàíàëó åñëè ïî ëèíèÿì óïðàâëåíèÿ
 				   		   //íè÷åãî íå ïðèõîäèò
+#define I2C_SLAVE 8  //i2c adress for slave mega2560
+
+char CCU11[] = "11";
+char CCU12[] = "12";
+char CCU13[] = "13";
+char CCU14[] = "14";
+char CCU15[] = "15";
+char CCU16[] = "16";
 
 //configuring all used ports pins for output DDxn = 1
 void Set_pin_out()
@@ -228,13 +237,6 @@ void gain_change_ccu(void (*ccu_out)(unsigned char), char mic1, char mic2)
 	//char mic1;
 	//char mic2;
 
-	//if (ccu == 0xC0) //îòäàåì óïðàâëåíèå êàì. êàíàëó åñëè ïî ëèíèÿì óïðàâëåíèÿ
-				   //íè÷åãî íå ïðèõîäèò
-	//	{	
-	//		CCU1_out(NO_CTRL);
-	//	}
-	//else
-	//	{
 			mic1 = 4 - mic1; //������� ����� �������� ������� ������������ �������� �������
 			mic1 &= 0b00000111;
 			mic1 |= 0b00001000;
@@ -249,7 +251,19 @@ void gain_change_ccu(void (*ccu_out)(unsigned char), char mic1, char mic2)
 			//portD_out(~mic2);
 			(*ccu_out)(~mic2);
 			//_delay_ms(250);
-	//	};
 };
 
-
+//function ccu_gain_transmit transmit ccu number and gain set to the i2c slave mega2560
+void ccu_gain_transmit(char* ccu_num, char mic1, char mic2)
+{
+	//char mic1;
+	//char mic2;
+    //ccu_num 11, 12, 13, 14, 15, 16
+	Wire.beginTransmission(I2C_SLAVE); // transmit to device #8
+    Wire.write(ccu_num[0]);        // sends ccu_num
+	Wire.write(ccu_num[1]);        // sends ccu_num
+    Wire.write(mic1);  
+	Wire.write(mic2);            // sends one byte
+    Wire.endTransmission();    // stop transmitting
+	delay(100);
+};

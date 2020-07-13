@@ -193,7 +193,7 @@ void outputPins(WebServer &server, WebServer::ConnectionType type, bool addContr
    server.printP(ccu_table_td_start);
    server << "name='ccu07' maxlength='11' size='11' value='" << cfg.ccu_name[6] << "' onchange=\"send_name('ccu07', document.form1.ccu07.value)\">";
         server.printP(ccu_ch1);
-        server << "<select name='" <<"s071"<< "' onchange=\"send_param('s071', document.form1.s071.selectedIndex)\">";
+        server <<"s071"<< "' onchange=\"send_param('s071', document.form1.s071.selectedIndex)\">";
         selectedOptions(server, cfg.ccu_ch[12]);     
        	server << "</select> </p>";
         server << "<p>" << "CH2 ";
@@ -521,12 +521,14 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[21-1] = mic1;
                   mic2 = cfg.ccu_ch[22-1];
+                  ccu_gain_transmit(CCU11, mic1, mic2);
 //todo: define CCU11_out for i2c connected mega //gain_change_ccu(CCU11_out, mic1, mic2);
                   break;
             case 112:
                   mic2 = (char) strtoul(value, NULL, 10);
                   cfg.ccu_ch[22-1] = mic2;
                   mic1 = cfg.ccu_ch[21-1];
+                  ccu_gain_transmit(CCU11, mic1, mic2);
                   //gain_change_ccu(CCU11_out, mic1, mic2);
                   break; 
  
@@ -534,12 +536,14 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[23-1] = mic1;
                   mic2 = cfg.ccu_ch[24-1];
+                  ccu_gain_transmit(CCU12, mic1, mic2);
 //todo: define CCU12_out for i2c connected mega //gain_change_ccu(CCU12_out, mic1, mic2);
                   break;
             case 122:
                   mic2 = (char) strtoul(value, NULL, 10);
                   cfg.ccu_ch[24-1] = mic2;
                   mic1 = cfg.ccu_ch[23-1];
+                  ccu_gain_transmit(CCU12, mic1, mic2);
                   //gain_change_ccu(CCU12_out, mic1, mic2);
                   break;
 
@@ -547,12 +551,14 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[25-1] = mic1;
                   mic2 = cfg.ccu_ch[26-1];
+                  ccu_gain_transmit(CCU13, mic1, mic2);
 //todo: define CCU13_out for i2c connected mega //gain_change_ccu(CCU13_out, mic1, mic2);
                   break;
             case 132:
                   mic2 = (char) strtoul(value, NULL, 10);
                   cfg.ccu_ch[26-1] = mic2;
                   mic1 = cfg.ccu_ch[25-1];
+                  ccu_gain_transmit(CCU13, mic1, mic2);
                   //gain_change_ccu(CCU13_out, mic1, mic2);
                   break; 
 
@@ -560,12 +566,14 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[27-1] = mic1;
                   mic2 = cfg.ccu_ch[28-1];
+                  ccu_gain_transmit(CCU14, mic1, mic2);
 //todo: define CCU14_out for i2c connected mega //gain_change_ccu(CCU14_out, mic1, mic2);
                   break;
             case 142:
                   mic2 = (char) strtoul(value, NULL, 10);
                   cfg.ccu_ch[28-1] = mic2;
                   mic1 = cfg.ccu_ch[27-1];
+                  ccu_gain_transmit(CCU14, mic1, mic2);
                   //gain_change_ccu(CCU14_out, mic1, mic2);
                   break;
 
@@ -573,12 +581,14 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[29-1] = mic1;
                   mic2 = cfg.ccu_ch[30-1];
+                  ccu_gain_transmit(CCU15, mic1, mic2);
 //todo: define CCU15_out for i2c connected mega //gain_change_ccu(CCU15_out, mic1, mic2);
                   break;
             case 152:
                   mic2 = (char) strtoul(value, NULL, 10);
                   cfg.ccu_ch[30-1] = mic2;
                   mic1 = cfg.ccu_ch[29-1];
+                  ccu_gain_transmit(CCU15, mic1, mic2);
                   //gain_change_ccu(CCU15_out, mic1, mic2);
                   break;
 
@@ -586,12 +596,14 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                   mic1 = (char) strtoul(value, NULL, 10); //save changed value to global array ccu_ch and give from array unchaged mic value
                   cfg.ccu_ch[31-1] = mic1;
                   mic2 = cfg.ccu_ch[32-1];
+                  ccu_gain_transmit(CCU16, mic1, mic2);
 //todo: define CCU16_out for i2c connected mega //gain_change_ccu(CCU16_out, mic1, mic2);
                   break;
             case 162:
                   mic2 = (char) strtoul(value, NULL, 10);
                   cfg.ccu_ch[32-1] = mic2;
                   mic1 = cfg.ccu_ch[31-1];
+                  ccu_gain_transmit(CCU16, mic1, mic2);
                   //gain_change_ccu(CCU16_out, mic1, mic2);
                   break;                                              
                    
@@ -764,13 +776,14 @@ void read_mic_settings()
 void setup()
 {
   pinMode(RESET_PIN, INPUT);
-  digitalWrite(RESET_PIN, HIGH);
+  digitalWrite(RESET_PIN, HIGH); //5 pin pull down during startup for reset to default
 
   Serial.begin(SERIAL_BAUD);
+  Wire.begin(); // join i2c bus (address optional for master)
+  
+  Set_pin_out();
   delay(200); // some time to settle
   // set pins for digital outputs
-  Set_pin_out();
- 
   read_mic_settings(); 
   
 //  set_mic_default();
@@ -787,6 +800,12 @@ void setup()
   gain_change_ccu(CCU8_out, cfg.ccu_ch[14], cfg.ccu_ch[15]);
   gain_change_ccu(CCU9_out, cfg.ccu_ch[16], cfg.ccu_ch[17]);
   gain_change_ccu(CCU10_out, cfg.ccu_ch[18], cfg.ccu_ch[19]);
+  ccu_gain_transmit(CCU11, cfg.ccu_ch[20], cfg.ccu_ch[21]);
+  ccu_gain_transmit(CCU12, cfg.ccu_ch[22], cfg.ccu_ch[23]);
+  ccu_gain_transmit(CCU13, cfg.ccu_ch[24], cfg.ccu_ch[25]);
+  ccu_gain_transmit(CCU14, cfg.ccu_ch[26], cfg.ccu_ch[27]);
+  ccu_gain_transmit(CCU15, cfg.ccu_ch[28], cfg.ccu_ch[29]);
+  ccu_gain_transmit(CCU16, cfg.ccu_ch[30], cfg.ccu_ch[31]);
   //gain_change_ccu(CCU11_out, cfg.ccu_ch[20], cfg.ccu_ch[21]);
   //gain_change_ccu(CCU12_out, cfg.ccu_ch[22], cfg.ccu_ch[23]);
   
