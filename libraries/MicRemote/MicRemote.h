@@ -246,10 +246,12 @@ void gain_change_ccu(void (*ccu_out)(unsigned char), char mic1, char mic2)
 			mic2 |= 0b00010000;
 
 			//portD_out(~mic1);
-			(*ccu_out)(~mic1);
+			//(*ccu_out)(~mic1); //inerse gpio for direct arduino-ccu connections
+			(*ccu_out)(mic1);    //direct output if using uln2003 driver between arduino and ccu 
 			_delay_ms(250);
 			//portD_out(~mic2);
-			(*ccu_out)(~mic2);
+			//(*ccu_out)(~mic2); //inerse gpio for direct arduino-ccu connections
+			(*ccu_out)(mic2);    //direct output if using uln2003 driver between arduino and ccu 
 			//_delay_ms(250);
 };
 
