@@ -8,6 +8,9 @@
 #define EEPROM_CCU_CH 60
 #define EEPROM_CCU_NAME 100
 
+// Power-Down Add-On Hardware
+const byte interruptPin = 19; //D19
+
 // no-cost stream operator as described at 
 // http://sundial.org/arduino/?page_id=119
 template<class T>
@@ -718,6 +721,11 @@ void saveParamCmd(WebServer &server, WebServer::ConnectionType type, char *url_t
      EEPROM_writeAnything(EEPROM_SET, cfg);
 }
 
+void saveParam()
+{  
+     EEPROM_writeAnything(EEPROM_SET, cfg);
+}
+
 void defaultCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
 {  
     outputPins(server, type, false);  
@@ -777,6 +785,8 @@ void setup()
 {
   pinMode(RESET_PIN, INPUT);
   digitalWrite(RESET_PIN, HIGH); //5 pin pull down during startup for reset to default
+
+  attachInterrupt(digitalPinToInterrupt(interruptPin), saveParam, FALLING); // ISR for power down detect
 
   Serial.begin(SERIAL_BAUD);
   Wire.begin(); // join i2c bus (address optional for master)
