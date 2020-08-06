@@ -107,7 +107,7 @@ void outputPins(WebServer &server, WebServer::ConnectionType type, bool addContr
   server.httpSuccess();
   server.printP(htmlHead);
   
-  int i;
+  int i;                //may be it is needless variable
   int j;
   int k;
   char ccu_ch_name[4];
@@ -719,17 +719,17 @@ void ccuNameCmd(WebServer &server, WebServer::ConnectionType type, char *url_tai
 void saveParamCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
 {  
      EEPROM_writeAnything(EEPROM_SET, cfg);
-}
+};
 
 void saveParam()
 {  
      EEPROM_writeAnything(EEPROM_SET, cfg);
-}
+};
 
 void defaultCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
 {  
     outputPins(server, type, false);  
-}
+};
 
 /** 
 * set_mic_default() function
@@ -785,8 +785,7 @@ void setup()
 {
   pinMode(RESET_PIN, INPUT);
   digitalWrite(RESET_PIN, HIGH); //5 pin pull down during startup for reset to default
-
-  attachInterrupt(digitalPinToInterrupt(interruptPin), saveParam, FALLING); // ISR for power down detect
+  pinMode(interruptPin, INPUT_PULLUP);
 
   Serial.begin(SERIAL_BAUD);
   Wire.begin(); // join i2c bus (address optional for master)
@@ -842,6 +841,8 @@ void setup()
 
   /* start the webserver */
   webserver->begin(); 
+  //delay(200); // some time to settle
+  attachInterrupt(digitalPinToInterrupt(interruptPin), saveParam, FALLING); // ISR for power down detect
 
 };
 

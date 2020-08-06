@@ -64,7 +64,7 @@ For more informations about EEPROMAnything.h look at http://playground.arduino.c
 
 
 //#define WEBDUINO_FAVICON_DATA "" // no favicon
-#define DEBUG  //uncomment for serial debug output
+//#define DEBUG  //uncomment for serial debug output
 #define USE_SYSTEM_LIBRARY //comment out if you want to save some space (about 1 Byte). You wouldn't see uptime and free RAM if it's commented out.
 #define SERIAL_BAUD 9600
 
@@ -83,7 +83,7 @@ For more informations about EEPROMAnything.h look at http://playground.arduino.c
 #include "EEPROMAnything.h"
 
 #define RESET_PIN 5	//Connect a button to this PIN. If the button is hold, an the device is turned on the default ethernet settings are restored.
-
+//#define RESET_PIN 19
 /* structure which is stored in the eeprom. 
 * Look at "EEPROMAnything.h" for the functions storing and reading the struct
 */
