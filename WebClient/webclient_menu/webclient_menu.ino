@@ -176,14 +176,14 @@ MENU(mainMenu,"Main menu",doNothing,noEvent,wrapStyle
 #define MAX_DEPTH 2
 
 // Encoder /////////////////////////////////////
-#define encA 2
-#define encB 3
+//#define encA 2
+//#define encB 3
 //this encoder has a button here
-#define encBtn 4
+//#define encBtn 4
 
-/*
+
  encoderIn<encA,encB> encoder;//simple quad encoder driver
- encoderInStream<encA,encB> encStream(encoder,4);// simple quad encoder fake Stream
+ encoderInStream<encA,encB> encStream(encoder, 1);// simple quad encoder fake Stream
 
 //a keyboard with only one key as the encoder button
  keyMap encBtn_map[]={{-encBtn,defaultNavCodes[enterCmd].ch}};//negative pin numbers use internal pull-up, this is on when low
@@ -191,15 +191,16 @@ MENU(mainMenu,"Main menu",doNothing,noEvent,wrapStyle
 
 // menuIn* inputsList[]={&encBuitton,&Serial};
 // chainStream<2> in(inputsList);//1 is the number of inputs
-*/
-ClickEncoder clickEncoder(encA,encB,encBtn,2);
-ClickEncoderStream encStream(clickEncoder,1);
-MENU_INPUTS(in,&encStream);
-void timerIsr() {clickEncoder.service();}
+
+//ClickEncoder clickEncoder(encA,encB,encBtn,2);
+//ClickEncoder clickEncoder(A1,A0,A2);
+//ClickEncoderStream encStream(clickEncoder,1);
+//MENU_INPUTS(in,&encStream);
+//void timerIsr() {clickEncoder.service();}
 
 serialIn serial(Serial);
 //MENU_INPUTS(in,&serial);
-//MENU_INPUTS(in,&encStream,&encButton);//,&serial);
+MENU_INPUTS(in,&encStream,&encButton,&serial);
 
 MENU_OUTPUTS(out,MAX_DEPTH
   ,U8G2_OUT(u8g2,colors,fontX,fontY,offsetX,offsetY,{0,0,U8_Width/fontX,U8_Height/fontY})
@@ -240,9 +241,9 @@ void setup() {
   Serial.begin(115200);
   while(!Serial);
   Serial.println("menu 4.x test");Serial.flush();
-  // encButton.begin();
-  // encoder.begin();
-  // pinMode(LEDPIN,OUTPUT);//cant use pin 13 when using hw spi
+   encButton.begin();
+   encoder.begin();
+   pinMode(LEDPIN,OUTPUT);//cant use pin 13 when using hw spi
   // and on esp12 i2c can be on pin 2, and that is also led pin
   // so check first if this is adequate for your board
   #if defined(USE_HWSPI)
@@ -261,8 +262,8 @@ void setup() {
   mainMenu[1].enabled=disabledStatus;
   nav.idleTask=idle;//point a function to be used when menu is suspended
   Serial.println("setup done.");Serial.flush();
-  Timer1.initialize(1000);
-  Timer1.attachInterrupt(timerIsr);
+  //Timer1.initialize();
+  //Timer1.attachInterrupt(timerIsr, 1000);
   delay(2000);
 }
 
@@ -274,5 +275,5 @@ void loop() {
     u8g2.firstPage();
     do nav.doOutput(); while(u8g2.nextPage());
   }
-  delay(100);//simulate other tasks delay
+  //delay(100);//simulate other tasks delay
 }

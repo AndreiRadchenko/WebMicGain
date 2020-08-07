@@ -2,6 +2,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "MyNetSetup.h"
+#include "pcint.h"
 
 #define EEPROM_ETHER 0
 #define EEPROM_SET 50
