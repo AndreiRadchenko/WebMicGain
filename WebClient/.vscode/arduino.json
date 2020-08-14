@@ -2,6 +2,6 @@
     "board": "arduino:avr:mega",
     "configuration": "cpu=atmega2560",
     "programmer": "Arduino as ISP",
-    "port": "/dev/ttyUSB0",
-    "sketch": "U8G2-enc/U8G2-enc.ino"
+    "sketch": "U8G2-enc/U8G2-enc.ino",
+    "port": "/dev/ttyUSB0"
 }

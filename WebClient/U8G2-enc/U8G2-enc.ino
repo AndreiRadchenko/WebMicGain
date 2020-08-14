@@ -1,5 +1,6 @@
 #include <Arduino.h>
-
+#include <EEPROM.h>
+#include "EEPROMAnything.h"
 /********************
 Arduino generic menu system
 U8G2 menu example
@@ -39,27 +40,7 @@ char ccu_name[16][16];    //string array for ccu names. names length is 16 char
 // #define USE_PCD8544
 #define USE_SSD1306
 
-#if defined(USE_PCD8544)
-  // rotary encoder pins
-  // #define encA    2
-  // #define encB    3
-  // #define encBtn  4
-
-  #include <SPI.h>
-  #define USE_HWSPI
-  #define U8_DC 9
-  #define U8_CS 8
-  #define U8_RST 7
-  //#define fontName u8g2_font_5x7_tf
-  #define fontName u8g2_font_prospero_bold_nbp_tr
-  #define fontX 5
-  #define fontY 9
-  #define offsetX 0
-  #define offsetY 0
-  #define U8_Width 84
-  #define U8_Height 48
-  U8G2_PCD8544_84X48_1_4W_HW_SPI u8g2(U8G2_R0, U8_CS, U8_DC , U8_RST);
-#elif defined(USE_SSD1306)
+#if defined(USE_SSD1306)
   // rotary encoder pins
    #define encA    62
    #define encB    63
@@ -84,6 +65,32 @@ char ccu_name[16][16];    //string array for ccu names. names length is 16 char
 #else
   #error DEFINE YOUR OUTPUT HERE.
 #endif
+/*
+uint16_t serEther1=0;
+uint16_t serEther2=0;
+//uint16_t sec=0;
+uint16_t serEther3=0;
+uint16_t serEther4=0;
+
+uint16_t devEther1=0;
+uint16_t devEther2=0;
+//uint16_t sec=0;
+uint16_t devEther3=0;
+uint16_t devEther4=0;
+*/
+struct config_t
+{
+    byte config_set;
+    byte use_dhcp;
+    byte dhcp_refresh_minutes;
+    byte mac[6];
+    byte ser_ip[4];
+    byte dev_ip[4];
+    byte gateway[4];
+    byte subnet[4];
+    byte dns_server[4];
+    unsigned int webserverPort;
+} eeprom_config;
 
 /** 
 * set_mic_default() function
@@ -150,6 +157,62 @@ result myLedOff() {
   return proceed;
 }
 
+result saveServerAddr(eventMask e,navNode& nav,prompt& item)
+{
+
+  switch(e) {
+    case enterEvent://entering navigation level (this menu is now active)
+      Serial.println(" enterEvent");
+      nav.root->showTitle = true;
+      break;
+    case exitEvent://leaving navigation level
+      Serial.println(" exitEvent");
+      nav.root->showTitle = false;
+
+      Serial.println();
+      Serial.print("Server IPv4 address: ");
+      Serial.print(eeprom_config.ser_ip[0]);
+      Serial.print(": ");
+      Serial.print(eeprom_config.ser_ip[1]);
+      Serial.print(": ");
+      Serial.print(eeprom_config.ser_ip[2]);
+      Serial.print(": ");
+      Serial.println(eeprom_config.ser_ip[3]);
+      EEPROM_writeAnything(0, eeprom_config);
+      break;
+  }
+
+  return proceed;
+}
+
+result saveDeviceAddr(eventMask e,navNode& nav,prompt& item)
+{
+
+  switch(e) {
+    case enterEvent://entering navigation level (this menu is now active)
+      Serial.println(" enterEvent");
+      nav.root->showTitle = true;
+      break;
+    case exitEvent://leaving navigation level
+      Serial.println(" exitEvent");
+      nav.root->showTitle = false;
+
+      Serial.println();
+      Serial.print("Device IPv4 address: ");
+      Serial.print(eeprom_config.dev_ip[0]);
+      Serial.print(": ");
+      Serial.print(eeprom_config.dev_ip[1]);
+      Serial.print(": ");
+      Serial.print(eeprom_config.dev_ip[2]);
+      Serial.print(": ");
+      Serial.println(eeprom_config.dev_ip[3]);
+      EEPROM_writeAnything(0, eeprom_config);
+      break;
+  }
+
+  return proceed;
+}
+
 TOGGLE(ledCtrl,setLed,"Led: ",doNothing,noEvent,noStyle//,doExit,enterEvent,noStyle
   ,VALUE("On",HIGH,doNothing,noEvent)
   ,VALUE("Off",LOW,doNothing,noEvent)
@@ -184,13 +247,13 @@ SELECT(ch1,selCH1," CH1 ",doNothing,noEvent,noStyle
   ,VALUE("-60 dB",4,doNothing,noEvent)
 );
 
-int ch2=7;
+int ch2=3;
 SELECT(ch2,selCH2," CH2 ",doNothing,noEvent,noStyle
-  ,VALUE("-20 dB",5,doNothing,noEvent)
-  ,VALUE("-30 dB",6,doNothing,noEvent)
-  ,VALUE("-40 dB",7,doNothing,noEvent)
-  ,VALUE("-50 dB",8,doNothing,noEvent)
-  ,VALUE("-60 dB",9,doNothing,noEvent)
+  ,VALUE("-20 dB",0,doNothing,noEvent)
+  ,VALUE("-30 dB",1,doNothing,noEvent)
+  ,VALUE("-40 dB",2,doNothing,noEvent)
+  ,VALUE("-50 dB",3,doNothing,noEvent)
+  ,VALUE("-60 dB",4,doNothing,noEvent)
 );
 
 int chooseTest=-1;
@@ -201,38 +264,30 @@ CHOOSE(chooseTest,chooseMenu,"Choose",doNothing,noEvent,noStyle
   ,VALUE("Last",-1,doNothing,noEvent)
 );
 
-// //customizing a prompt look!
-// //by extending the prompt class
-// class altPrompt:public prompt {
-// public:
-//   altPrompt(constMEM promptShadow& p):prompt(p) {}
-//   Used printTo(navRoot &root,bool sel,menuOut& out, idx_t idx,idx_t len,idx_t panelNr) override {
-//     return out.printRaw(F("special prompt!"),len);;
-//   }
-// };
-
-MENU(setMenu,"Settings",doNothing,noEvent,noStyle
-  ,OP("Sub1",doNothing,noEvent)
+MENU(setSvrEthMenu,"Server Address",saveServerAddr,exitEvent | enterEvent,noStyle
+  //,OP("Srv IPv4 addr",doNothing,noEvent)
+  ,FIELD(eeprom_config.ser_ip[0],"Eth1","",0,255,10,1,doNothing,noEvent,noStyle)
+  ,FIELD(eeprom_config.ser_ip[1],"Eth2","",0,255,10,1,doNothing,noEvent,noStyle)
+  ,FIELD(eeprom_config.ser_ip[2],"Eth3","",0,255,10,1,doNothing,noEvent,noStyle)
+  ,FIELD(eeprom_config.ser_ip[3],"Eth4","",0,255,10,1,doNothing,noEvent,noStyle)
   // ,altOP(altPrompt,"",doNothing,noEvent)
-  ,EXIT("<Back")
+  ,EXIT("<Save")
 );
 
-MENU(ctrlMenu,"Mic control",doNothing,noEvent,wrapStyle
+MENU(setDevEthMenu,"Device Address",saveDeviceAddr,exitEvent | enterEvent,noStyle
+  //,OP("Srv IPv4 addr",doNothing,noEvent)
+  ,FIELD(eeprom_config.dev_ip[0],"Eth1","",0,255,10,1,doNothing,noEvent,noStyle)
+  ,FIELD(eeprom_config.dev_ip[1],"Eth2","",0,255,10,1,doNothing,noEvent,noStyle)
+  ,FIELD(eeprom_config.dev_ip[2],"Eth3","",0,255,10,1,doNothing,noEvent,noStyle)
+  ,FIELD(eeprom_config.dev_ip[3],"Eth4","",0,255,10,1,doNothing,noEvent,noStyle)
+  // ,altOP(altPrompt,"",doNothing,noEvent)
+  ,EXIT("<Save")
+);
+
+MENU(ctrlMenu,"Mic Control",doNothing,noEvent,wrapStyle
   ,SUBMENU(selCCU)
   ,SUBMENU(selCH1)
   ,SUBMENU(selCH2)
-);
-
-uint16_t hrs=0;
-uint16_t mins=0;
-uint16_t sec=0;
-
-//define a pad style menu (single line menu)
-//here with a set of fields to enter a date in YYYY/MM/DD format
-altMENU(menu,timeMenu,"Time",doNothing,noEvent,noStyle,(systemStyles)(_asPad|Menu::_menuData|Menu::_canNav|_parentDraw)
-  ,FIELD(hrs,"",":",0,11,1,0,doNothing,noEvent,noStyle)
-  ,FIELD(mins,"",":",0,59,10,1,doNothing,noEvent,wrapStyle)
-  ,FIELD(sec,"","",0,59,10,1,doNothing,noEvent,wrapStyle)
 );
 
 char* constMEM hexDigit MEMMODE="0123456789ABCDEF";
@@ -241,7 +296,8 @@ char buf1[]="0x11";
 
 MENU(mainMenu,"",doNothing,noEvent,wrapStyle
   ,SUBMENU(ctrlMenu)
-  ,SUBMENU(setMenu)
+  ,SUBMENU(setSvrEthMenu)
+  ,SUBMENU(setDevEthMenu)
 );
 
 // MENU(mainMenu,"",doNothing,noEvent,wrapStyle
@@ -289,11 +345,12 @@ MENU(mainMenu,"",doNothing,noEvent,wrapStyle
 
 serialIn serial(Serial);
 //MENU_INPUTS(in,&serial);
-MENU_INPUTS(in,&encStream,&encButton,&serial);
+MENU_INPUTS(in,&encStream,&encButton);//,&serial);
 
 MENU_OUTPUTS(out,MAX_DEPTH
   ,U8G2_OUT(u8g2,colors,fontX,fontY,offsetX,offsetY,{0,0,U8_Width/fontX,U8_Height/fontY})
-  ,SERIAL_OUT(Serial)
+  ,NONE
+  //,SERIAL_OUT(Serial)
 );
 
 NAVROOT(nav,mainMenu,MAX_DEPTH,in,out);
@@ -326,13 +383,10 @@ result idle(menuOut& o,idleEvent e) {
   return proceed;
 }
 
-void setupCmd() {
-  nav.showTitle != nav.showTitle;
-}
-
 void setup() {
 
   set_mic_default();
+  read_EEPROM_Settings();
 
   Serial.begin(115200);
   while(!Serial);
