@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 #include "EEPROMAnything.h"
+#include <SPI.h>
+#include <Ethernet.h>
 /********************
 Arduino generic menu system
 U8G2 menu example
@@ -65,19 +67,6 @@ char ccu_name[16][16];    //string array for ccu names. names length is 16 char
 #else
   #error DEFINE YOUR OUTPUT HERE.
 #endif
-/*
-uint16_t serEther1=0;
-uint16_t serEther2=0;
-//uint16_t sec=0;
-uint16_t serEther3=0;
-uint16_t serEther4=0;
-
-uint16_t devEther1=0;
-uint16_t devEther2=0;
-//uint16_t sec=0;
-uint16_t devEther3=0;
-uint16_t devEther4=0;
-*/
 struct config_t
 {
     byte config_set;
@@ -386,11 +375,14 @@ result idle(menuOut& o,idleEvent e) {
 void setup() {
 
   set_mic_default();
-  read_EEPROM_Settings();
+  //read_EEPROM_Settings();
 
   Serial.begin(115200);
   while(!Serial);
   Serial.println("menu 4.x test");Serial.flush();
+
+  setupNetwork();
+
    encButton.begin();
    encoder.begin();
    pinMode(LEDPIN,OUTPUT);//cant use pin 13 when using hw spi
@@ -425,5 +417,6 @@ void loop() {
     u8g2.firstPage();
     do nav.doOutput(); while(u8g2.nextPage());
   }
-  delay(100);//simulate other tasks delay
+  //delay(100);//simulate other tasks delay
+  readWebResponce();
 }

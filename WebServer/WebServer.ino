@@ -67,6 +67,9 @@ P(ccu_ch2) = "</select> </p> <p> CH2 <select name='";
 
 void outputPins(WebServer &server, WebServer::ConnectionType type, bool addControls = false)
 {
+  #ifdef DEBUG    
+      Serial.println("Respons to GET request...");   
+  #endif     
   P(htmlHead) =
     "<html>"
     "<head>"
@@ -717,6 +720,46 @@ void ccuNameCmd(WebServer &server, WebServer::ConnectionType type, char *url_tai
 };
 //===========================================================================================================================================================
 
+void ccuGetParamCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
+{
+  if (type == WebServer::POST)
+  {    
+
+    bool repeat;
+    char pname[16];
+    char value[16];
+    int  ccu_number;
+
+    do
+    {
+      repeat = server.readPOSTparam(pname, 16, value, 16);
+      //ch_number = atoi((pname+1));
+      ccu_number = (int) strtoul((pname+3), NULL, 10);      
+      #ifdef DEBUG    
+         Serial.println("Respons to POST request..."); 
+         Serial.print("pname = "); 
+         Serial.println(pname); 
+         Serial.print("value = ");   
+         Serial.println(value);  
+       #endif
+      if (repeat)
+     {
+       #ifdef DEBUG    
+         Serial.println("running ccuGetParamCmd()...");   
+       #endif     
+       //server.httpSuccess();
+       //server << "<html><body>";
+       server<<cfg.ccu_name[ccu_number-1]<<" "<<cfg.ccu_ch[2*(ccu_number-1)]<<" "<<cfg.ccu_ch[2*ccu_number-1];
+       //server << "</body></html>";
+      };//if(repeat)
+    } while (repeat);
+    
+//    server.httpSeeOther(PREFIX "/form");
+  }
+};
+//===========================================================================================================================================================
+
+
 void saveParamCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
 {  
      EEPROM_writeAnything(EEPROM_SET, cfg);
@@ -824,7 +867,7 @@ void setup()
   setupNetwork();
 
   // start the Ethernet connection and the server:
-  Ethernet.begin(eeprom_config.mac, eeprom_config.ip);
+  //Ethernet.begin(eeprom_config.mac, eeprom_config.ip);
   
   delay(200); // some time to settle
   webserver = new WebServer(PREFIX, eeprom_config.webserverPort);
@@ -833,7 +876,7 @@ void setup()
   webserver->addCommand("form", &formCmd);  
   webserver->addCommand("ccuName", &ccuNameCmd); 
   webserver->addCommand("saveParam", &saveParamCmd);   
- 
+  webserver->addCommand("ccuGetParam", &ccuGetParamCmd);
    /* setup our default command that will be run when the user accesses
    * a page NOT on the server */
   webserver->setFailureCommand(&errorHTML);
