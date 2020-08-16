@@ -27,7 +27,12 @@ mcu: nano328p
 #include <menuIO/serialOut.h>
 #include <menuIO/serialIn.h>
 
+EthernetClient client;
+
 using namespace Menu;
+
+int ch1=1; //gain value: 0 = -20 dB; 1 = -30 db; ... 4 = -60 db;
+int ch2=2;
 
 struct config_mic
 {
@@ -38,6 +43,8 @@ char ccu_name[16][16];    //string array for ccu names. names length is 16 char
 
 #define LEDPIN LED_BUILTIN
 #define __AVR_ATmega2560__
+
+#define DEBAG
 
 // #define USE_PCD8544
 #define USE_SSD1306
@@ -100,6 +107,7 @@ void set_mic_default()
     strcpy(cfg.ccu_name[j], "CCU");
     num = itoa(j+1,buf,10);
     strcat(cfg.ccu_name[j], num);
+    //strcat(cfg.ccu_name[j], '\0');
   }; 
   // global unsigned char ccu_ch[32];
   for (i = 0; i <= 31; i++)
@@ -143,6 +151,29 @@ result myLedOn() {
 }
 result myLedOff() {
   ledCtrl=LOW;
+  return proceed;
+}
+
+result ccuGetParam(eventMask e,navNode& nav,prompt& item)
+{
+  switch(e) {
+    case enterEvent://entering navigation level (this menu is now active)
+      //Serial.println(" enterEvent");
+      //nav.root->showTitle = true;
+      break;
+    case exitEvent://leaving navigation level
+      //Serial.println(" exitEvent");
+      //nav.root->showTitle = false; //nav.selected()
+      //idx_t n=nav.root->path[nav.root->level-1].sel;
+      idx_t n=nav.root->path[nav.root->level+1].sel;
+      //Serial.println("nav.node().sel: ");
+      //Serial.println(n);
+      
+      ccuGetParamHttpRequest(n);
+
+      //selCH1[1]
+      break;
+  }
   return proceed;
 }
 
@@ -208,7 +239,8 @@ TOGGLE(ledCtrl,setLed,"Led: ",doNothing,noEvent,noStyle//,doExit,enterEvent,noSt
 );
 
 int ccu=1;
-SELECT(ccu,selCCU," CCU ",doNothing,noEvent,noStyle
+SELECT(ccu,selCCU," CCU ",ccuGetParam,exitEvent | enterEvent,noStyle
+//SELECT(ccu,selCCU," CCU ",doNothing,noEvent,noStyle
   ,VALUE("CAM1",1,doNothing,noEvent)
   ,VALUE("CAM2",2,doNothing,noEvent)
   ,VALUE("CAM3",3,doNothing,noEvent)
@@ -225,9 +257,25 @@ SELECT(ccu,selCCU," CCU ",doNothing,noEvent,noStyle
   ,VALUE("CAM14",14,doNothing,noEvent)
   ,VALUE("CAM15",15,doNothing,noEvent)
   ,VALUE("CAM16",16,doNothing,noEvent)  
+ /*  ,VALUE(cfg.ccu_name[0],1,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[1],2,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[2],3,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[3],4,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[4],5,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[5],6,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[6],7,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[7],8,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[8],9,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[9],10,doNothing,noEvent)  
+  ,VALUE(cfg.ccu_name[10],11,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[11],12,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[12],13,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[13],14,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[14],15,doNothing,noEvent)
+  ,VALUE(cfg.ccu_name[15],16,doNothing,noEvent) */
 );
 
-int ch1=1;
+//int ch1=1;
 SELECT(ch1,selCH1," CH1 ",doNothing,noEvent,noStyle
   ,VALUE("-20 dB",0,doNothing,noEvent)
   ,VALUE("-30 dB",1,doNothing,noEvent)
@@ -236,21 +284,13 @@ SELECT(ch1,selCH1," CH1 ",doNothing,noEvent,noStyle
   ,VALUE("-60 dB",4,doNothing,noEvent)
 );
 
-int ch2=3;
+//int ch2=3;
 SELECT(ch2,selCH2," CH2 ",doNothing,noEvent,noStyle
   ,VALUE("-20 dB",0,doNothing,noEvent)
   ,VALUE("-30 dB",1,doNothing,noEvent)
   ,VALUE("-40 dB",2,doNothing,noEvent)
   ,VALUE("-50 dB",3,doNothing,noEvent)
   ,VALUE("-60 dB",4,doNothing,noEvent)
-);
-
-int chooseTest=-1;
-CHOOSE(chooseTest,chooseMenu,"Choose",doNothing,noEvent,noStyle
-  ,VALUE("First",1,doNothing,noEvent)
-  ,VALUE("Second",2,doNothing,noEvent)
-  ,VALUE("Third",3,doNothing,noEvent)
-  ,VALUE("Last",-1,doNothing,noEvent)
 );
 
 MENU(setSvrEthMenu,"Server Address",saveServerAddr,exitEvent | enterEvent,noStyle
@@ -375,28 +415,20 @@ result idle(menuOut& o,idleEvent e) {
 void setup() {
 
   set_mic_default();
-  //read_EEPROM_Settings();
 
-  Serial.begin(115200);
-  while(!Serial);
-  Serial.println("menu 4.x test");Serial.flush();
+  #ifdef DEBAG
+    Serial.begin(115200);
+    while(!Serial);
+    Serial.println("menu 4.x test");Serial.flush();
+  #endif
 
   setupNetwork();
 
-   encButton.begin();
-   encoder.begin();
-   pinMode(LEDPIN,OUTPUT);//cant use pin 13 when using hw spi
-  // and on esp12 i2c can be on pin 2, and that is also led pin
-  // so check first if this is adequate for your board
-  #if defined(USE_HWSPI)
-    SPI.begin();
-    u8g2.begin();
-  #elif defined(USE_HWI2C)
-    Wire.begin();
-    u8g2.begin();
-  #else
-    #error "please choose your interface (I2c,SPI)"
-  #endif
+  encButton.begin();
+  encoder.begin();
+  Wire.begin();
+  u8g2.begin();
+
   u8g2.setFont(fontName);
   // u8g2.setBitmapMode(0);
 
@@ -404,7 +436,9 @@ void setup() {
   //mainMenu[1].enabled=disabledStatus;
   nav.idleTask=idle;//point a function to be used when menu is suspended
   nav.showTitle = false;
-  Serial.println("setup done.");Serial.flush();
+  #ifdef DEBUG
+    Serial.println("setup done.");Serial.flush();
+  #endif
   //nav.doNav(navCmd(idxCmd,0)); //hilite first option
   nav.doNav(navCmd(enterCmd)); //execute option
 }
@@ -418,5 +452,5 @@ void loop() {
     do nav.doOutput(); while(u8g2.nextPage());
   }
   //delay(100);//simulate other tasks delay
-  readWebResponce();
+  //readWebResponce();
 }
