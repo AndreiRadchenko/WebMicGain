@@ -387,8 +387,15 @@ void formCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
     {
       repeat = server.readPOSTparam(pname, 16, value, 16);
       //ch_number = atoi((pname+1));
-      ch_number = (int) strtoul((pname+1), NULL, 10);      
+      ch_number = (int) strtoul((pname+1), NULL, 10);
 
+      #ifdef DEBUG
+         Serial.print("formCmd() pname = ");
+         Serial.print(pname);
+         Serial.print(" value = ");
+         Serial.println(value);
+      #endif   
+      
       if (repeat)
      {
       

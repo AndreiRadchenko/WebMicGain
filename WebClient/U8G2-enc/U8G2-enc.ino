@@ -31,6 +31,7 @@ EthernetClient client;
 
 using namespace Menu;
 
+int ccu=1; //current ccu number
 int ch1=1; //gain value: 0 = -20 dB; 1 = -30 db; ... 4 = -60 db;
 int ch2=2;
 
@@ -154,6 +155,16 @@ result myLedOff() {
   return proceed;
 }
 
+result ccuSetGainCH1(eventMask e,navNode& nav,prompt& item)
+{
+  //ccuSetGainHttpRequest(ccu, 1, ch1);
+}
+
+result ccuSetGainCH2(eventMask e,navNode& nav,prompt& item)
+{
+  //ccuSetGainHttpRequest(ccu, 2, ch2);
+}
+
 result ccuGetParam(eventMask e,navNode& nav,prompt& item)
 {
   switch(e) {
@@ -168,8 +179,9 @@ result ccuGetParam(eventMask e,navNode& nav,prompt& item)
       idx_t n=nav.root->path[nav.root->level+1].sel;
       //Serial.println("nav.node().sel: ");
       //Serial.println(n);
-      
+
       ccuGetParamHttpRequest(n);
+      //ccuGetParamHttpRequest(ccu);
 
       //selCH1[1]
       break;
@@ -238,7 +250,6 @@ TOGGLE(ledCtrl,setLed,"Led: ",doNothing,noEvent,noStyle//,doExit,enterEvent,noSt
   ,VALUE("Off",LOW,doNothing,noEvent)
 );
 
-int ccu=1;
 SELECT(ccu,selCCU," CCU ",ccuGetParam,exitEvent | enterEvent,noStyle
 //SELECT(ccu,selCCU," CCU ",doNothing,noEvent,noStyle
   ,VALUE("CAM1",1,doNothing,noEvent)
@@ -276,6 +287,7 @@ SELECT(ccu,selCCU," CCU ",ccuGetParam,exitEvent | enterEvent,noStyle
 );
 
 //int ch1=1;
+//SELECT(ch1,selCH1," CH1 ",ccuSetGainCH1,exitEvent,noStyle
 SELECT(ch1,selCH1," CH1 ",doNothing,noEvent,noStyle
   ,VALUE("-20 dB",0,doNothing,noEvent)
   ,VALUE("-30 dB",1,doNothing,noEvent)
@@ -285,6 +297,7 @@ SELECT(ch1,selCH1," CH1 ",doNothing,noEvent,noStyle
 );
 
 //int ch2=3;
+//SELECT(ch2,selCH2," CH2 ",ccuSetGainCH2,exitEvent,noStyle
 SELECT(ch2,selCH2," CH2 ",doNothing,noEvent,noStyle
   ,VALUE("-20 dB",0,doNothing,noEvent)
   ,VALUE("-30 dB",1,doNothing,noEvent)
