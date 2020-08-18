@@ -158,11 +158,13 @@ result myLedOff() {
 result ccuSetGainCH1(eventMask e,navNode& nav,prompt& item)
 {
   //ccuSetGainHttpRequest(ccu, 1, ch1);
+  return proceed;
 }
 
 result ccuSetGainCH2(eventMask e,navNode& nav,prompt& item)
 {
   //ccuSetGainHttpRequest(ccu, 2, ch2);
+  return proceed;
 }
 
 result ccuGetParam(eventMask e,navNode& nav,prompt& item)
