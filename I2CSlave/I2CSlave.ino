@@ -2,8 +2,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-#define SERIAL_BAUD 9600
-#define DEBAG
+#define SERIAL_BAUD 115200
+#define DEBUG
 //byte mic_config_set;
 //unsigned char ccu_ch[24]; // global array for saving gain value
 //char ccu_name[12][16];    //string array for ccu names. names length is 16 char
@@ -47,7 +47,7 @@ void receiveEvent(int howMany) {
                   break;
           };
 
-  #ifdef DEBAG
+  #ifdef DEBUG
       Serial.print("CCU");         
       Serial.print(ccu_num); 
       //Serial.print(ccu[1]);
@@ -62,7 +62,8 @@ void receiveEvent(int howMany) {
 void setup()
 {
   Serial.begin(SERIAL_BAUD);
-  Wire.begin(I2C_SLAVE); // join i2c bus (address optional for master)
+  //Wire.begin(I2C_SLAVE); // join i2c bus (address optional for master)
+  Wire.begin(8);
   Wire.onReceive(receiveEvent); // register event
 
   Set_pin_out();

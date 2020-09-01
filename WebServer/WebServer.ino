@@ -2,7 +2,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "MyNetSetup.h"
-#include "pcint.h"
+//#include "pcint.h"
 
 #define EEPROM_ETHER 0
 #define EEPROM_SET 50
@@ -10,7 +10,7 @@
 #define EEPROM_CCU_NAME 100
 
 // Power-Down Add-On Hardware
-const byte interruptPin = 69; //D19
+//const byte interruptPin = 69; //D19
 
 // no-cost stream operator as described at 
 // http://sundial.org/arduino/?page_id=119
@@ -341,8 +341,8 @@ void outputPins(WebServer &server, WebServer::ConnectionType type, bool addContr
   server << "</tr>";
   server << "</table>";// <p> <br> </p>";
   server << "</form>";
-  //server << "<p> <br> <br> <br> <input type='submit' name='button' value='Save Settings'  onClick=\"save_param()\">";// </p>"; 
-  server << "<p> <br> <br> <br> <input type='submit' name='button2' value='Set All Microphones'  onClick=\"set_param()\"> </p>";
+  server << "<p> <br> <br> <br> <input type='submit' name='button' value='Save Settings'  onClick=\"save_param()\">";// </p>"; 
+  server << " <input type='submit' name='button2' value='Set All Microphones'  onClick=\"set_param()\"> </p>";
   server << "<p> <br> <br> <br> <br> <br> <br> <br> <br> <a href=\"setupNet.html\">NETWORK SETUP</a> </p>";
  
   
@@ -776,10 +776,14 @@ void saveParamCmd(WebServer &server, WebServer::ConnectionType type, char *url_t
      EEPROM_writeAnything(EEPROM_SET, cfg);
 };
 
-void saveParam()
+/* void saveParam()
 {  
+     #ifdef DEBUG    
+         Serial.println("Save param on turn off");   
+     #endif 
      EEPROM_writeAnything(EEPROM_SET, cfg);
-};
+     PCdetachInterrupt<interruptPin>();
+}; */
 
 void setParamCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) 
 {
@@ -834,6 +838,9 @@ void set_mic_default()
   {
     cfg.ccu_ch[i] = 2; //-40dB потом инициализация будет значениями из EEPROM
   };
+  #ifdef DEBUG
+      Serial.println("set_mic_default()..");
+  #endif 
 }
 
 /**
@@ -847,6 +854,7 @@ void set_mic_default()
 void read_mic_settings() 
 { 
   // read the current config
+  //Serial.println("reading mic setting");
   EEPROM_readAnything(EEPROM_SET, cfg);
   
   // check if config is present or if reset button is pressed
@@ -856,14 +864,17 @@ void read_mic_settings()
     set_mic_default();   
     // write the config to eeprom
     EEPROM_writeAnything(EEPROM_SET, cfg);
-  } 
+  }
+  //Serial.println("exit reading mic setting"); 
 }
 
 void setup()
 {
   pinMode(RESET_PIN, INPUT);
   digitalWrite(RESET_PIN, HIGH); //5 pin pull down during startup for reset to default
-  pinMode(interruptPin, INPUT_PULLUP);
+  //pinMode(interruptPin, INPUT_PULLUP);
+
+  //PCdetachInterrupt<interruptPin>();
 
   Serial.begin(SERIAL_BAUD);
   Wire.begin(); // join i2c bus (address optional for master)
@@ -873,7 +884,7 @@ void setup()
   // set pins for digital outputs
   read_mic_settings(); 
   
-//  set_mic_default();
+  //set_mic_default();
   
   //delay(500);
   //set out pins to saved value
@@ -922,7 +933,7 @@ void setup()
   webserver->begin(); 
   //delay(200); // some time to settle
   //attachInterrupt(digitalPinToInterrupt(interruptPin), saveParam, FALLING); // ISR for power down detect
-  PCattachInterrupt<interruptPin>(saveParam, FALLING);
+  //PCattachInterrupt<interruptPin>(saveParam, FALLING);
 
 };
 

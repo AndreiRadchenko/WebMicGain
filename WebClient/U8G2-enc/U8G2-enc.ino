@@ -35,8 +35,8 @@ int ccu=1;
 int ch1=1; //gain value: 0 = -20 dB; 1 = -30 db; ... 4 = -60 db;
 int ch2=2;
 
-#define CH1 1
-#define CH2 2
+#define _CH1 1
+#define _CH2 2
 
 struct config_mic
 {
@@ -71,10 +71,13 @@ char ccu_name[16][16];    //string array for ccu names. names length is 16 char
   #define U8_Width 128
   #define U8_Height 64
   #define USE_HWI2C
-  U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);//, SCL, SDA);
+  //U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);//, SCL, SDA);
   // U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R2, U8X8_PIN_NONE, 4, 5);
   // U8G2_SSD1306_128X64_VCOMH0_F_HW_I2C u8g2(U8G2_R2, U8X8_PIN_NONE, 4, 5);
-  // U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, 4, 5);
+  //U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, 6, 7);
+  U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+  //U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, /* clock=*/ 5, /* data=*/ 6, /* reset=*/ U8X8_PIN_NONE);
+  //U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, /* clock=*/ SCL, /* data=*/ SDA, /* reset=*/ U8X8_PIN_NONE);
 #else
   #error DEFINE YOUR OUTPUT HERE.
 #endif
@@ -116,14 +119,15 @@ result setGainCh1(eventMask e,navNode& nav,prompt& item)
   //setGainHttpRequest(CH1, ch1);
   switch(e) {
     case enterEvent://entering navigation level (this menu is now active)
-      Serial.println(" enterEvent");
+      //Serial.println(" enterEvent");
       //nav.root->showTitle = true;
       break;
     case exitEvent://leaving navigation level
-      Serial.println(" exitEvent");
+      //Serial.println(" exitEvent");
       //nav.root->showTitle = false; //nav.selected()
       //idx_t n=nav.root->path[nav.root->level-1].sel;
-      idx_t n=nav.root->path[nav.root->level+1].sel;
+      //idx_t n=nav.root->path[nav.root->level+1].sel;
+      setGainHttpRequest(_CH1, ch1);
       //Serial.println("nav.node().sel: ");
       //Serial.println(n);
 
@@ -138,14 +142,15 @@ result setGainCh2(eventMask e,navNode& nav,prompt& item)
   //setGainHttpRequest(CH2, ch2);
   switch(e) {
     case enterEvent://entering navigation level (this menu is now active)
-      Serial.println(" enterEvent");
+      //Serial.println(" enterEvent");
       //nav.root->showTitle = true;
       break;
     case exitEvent://leaving navigation level
-      Serial.println(" exitEvent");
+      //Serial.println(" exitEvent");
       //nav.root->showTitle = false; //nav.selected()
       //idx_t n=nav.root->path[nav.root->level-1].sel;
-      idx_t n=nav.root->path[nav.root->level+1].sel;
+      //idx_t n=nav.root->path[nav.root->level+1].sel;
+      setGainHttpRequest(_CH2, ch2);
       //Serial.println("nav.node().sel: ");
       //Serial.println(n);
 
@@ -255,8 +260,8 @@ SELECT(ccu,selCCU," CCU ",ccuGetParam,exitEvent | enterEvent,noStyle
 );
 
 //int ch1=1; setGainCh1
-SELECT(ch1,selCH1," CH1 ",doNothing,noEvent,noStyle
-//SELECT(ch1,selCH1," CH1 ",setGainCh1,exitEvent | enterEvent,noStyle
+//SELECT(ch1,selCH1," CH1 ",doNothing,noEvent,noStyle
+SELECT(ch1,selCH1," CH1 ",setGainCh1,exitEvent | enterEvent,noStyle
   ,VALUE("-20 dB",0,doNothing,noEvent)
   ,VALUE("-30 dB",1,doNothing,noEvent)
   ,VALUE("-40 dB",2,doNothing,noEvent)
@@ -265,8 +270,8 @@ SELECT(ch1,selCH1," CH1 ",doNothing,noEvent,noStyle
 );
 
 //int ch2=3;
-SELECT(ch2,selCH2," CH2 ",doNothing,noEvent,noStyle
-//SELECT(ch2,selCH2," CH2 ",setGainCh2,exitEvent | enterEvent,noStyle
+//SELECT(ch2,selCH2," CH2 ",doNothing,noEvent,noStyle
+SELECT(ch2,selCH2," CH2 ",setGainCh2,exitEvent | enterEvent,noStyle
   ,VALUE("-20 dB",0,doNothing,noEvent)
   ,VALUE("-30 dB",1,doNothing,noEvent)
   ,VALUE("-40 dB",2,doNothing,noEvent)
@@ -355,8 +360,8 @@ MENU_INPUTS(in,&encStream,&encButton);//,&serial);
 
 MENU_OUTPUTS(out,MAX_DEPTH
   ,U8G2_OUT(u8g2,colors,fontX,fontY,offsetX,offsetY,{0,0,U8_Width/fontX,U8_Height/fontY})
-  ,NONE
-  //,SERIAL_OUT(Serial)
+  //,NONE
+  ,SERIAL_OUT(Serial)
 );
 
 NAVROOT(nav,mainMenu,MAX_DEPTH,in,out);
@@ -402,9 +407,16 @@ void setup() {
   setupNetwork();
 
   encButton.begin();
+    #ifdef DEBUG
+    //Serial.print("PostData: ");
+    Serial.println("encButton.begin()..");
+    #endif 
   encoder.begin();
+    Serial.println("encoder.begin()..");
   Wire.begin();
+    Serial.println("Wire.begin()..");
   u8g2.begin();
+    Serial.println("u8g2.begin()..");
 
   u8g2.setFont(fontName);
   // u8g2.setBitmapMode(0);
@@ -417,7 +429,8 @@ void setup() {
     Serial.println("setup done.");Serial.flush();
   #endif
   //nav.doNav(navCmd(idxCmd,0)); //hilite first option
-  nav.doNav(navCmd(enterCmd)); //execute option
+  nav.doNav(navCmd(enterCmd)); //execute option for entering Mic Control menu at startup
+  //ccuGetParamHttpRequest(0);
 }
 
 void loop() {
