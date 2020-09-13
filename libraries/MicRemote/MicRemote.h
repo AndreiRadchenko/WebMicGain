@@ -261,11 +261,24 @@ void ccu_gain_transmit(char* ccu_num, char mic1, char mic2)
 	//char mic1;
 	//char mic2;
     //ccu_num 11, 12, 13, 14, 15, 16
-	Wire.beginTransmission(I2C_SLAVE); // transmit to device #8
+	  //Serial.println("gain transmitt");
+	//Wire.beginTransmission(I2C_SLAVE); // transmit to device #8
+	Wire.beginTransmission(8); // transmit to device #8
+	  //Serial.println("beginTransmission()");
     Wire.write(ccu_num[0]);        // sends ccu_num
+	  //Serial.print("write(ccu_num[0]): ");
+	  //Serial.println(ccu_num[0]);
 	Wire.write(ccu_num[1]);        // sends ccu_num
-    Wire.write(mic1);  
+	  //Serial.print("write(ccu_num[1]): ");
+	  //Serial.println(ccu_num[1]);
+    Wire.write(mic1);
+	  //Serial.print("write(mic1): ");
+	  //Serial.println(mic1);  
 	Wire.write(mic2);            // sends one byte
+	  //Serial.print("write(mic2): ");
+	  //Serial.println(mic2); 
     Wire.endTransmission();    // stop transmitting
+	  //Serial.println("endTransmission()");
 	delay(100);
+	  //Serial.println("exit gain transmitt");
 };

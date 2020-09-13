@@ -107,6 +107,7 @@ struct config_t
 * This settings are used when no config is present or the reset button is pressed.
 */
 void set_EEPROM_Default() {
+  //Serial.println("set eeprom default");
     eeprom_config.config_set=1;  // dont change! It's used to check if the config is already set
   
     eeprom_config.use_dhcp=0; // use DHCP per default
@@ -145,11 +146,12 @@ void set_EEPROM_Default() {
     eeprom_config.dns_server[3]=254;
 
     // set the default Webserver Port. In this case its Port 80
-    eeprom_config.webserverPort=80;
+    //eeprom_config.webserverPort=80;
     
     #ifdef DEBUG
       Serial.println("Config reset");
     #endif 
+    //Serial.println("exit set eeprom default");
 }
 
 
@@ -164,6 +166,9 @@ void set_EEPROM_Default() {
 */
 void read_EEPROM_Settings() {
 
+/*   set_EEPROM_Default();
+  // write the config to eeprom
+  EEPROM_writeAnything(0, eeprom_config); */
   
   // read the current config
   EEPROM_readAnything(0, eeprom_config);
@@ -293,7 +298,7 @@ void renewDHCP(int interval) {
 */
 void setupNetwork() {
   read_EEPROM_Settings();
-  
+  //set_EEPROM_Default();
   #ifdef DEBUG
    print_EEPROM_Settings();
   #endif

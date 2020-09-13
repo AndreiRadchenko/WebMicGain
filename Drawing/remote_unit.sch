@@ -1,0 +1,317 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A3 16535 11693
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L arduino:Arduino_Mega2560_Shield XA?
+U 1 1 5F1536B2
+P 7100 5600
+F 0 "XA?" H 7100 3219 60  0000 C CNN
+F 1 "Mega2560_Master" H 7100 3113 60  0000 C CNN
+F 2 "" H 7800 8350 60  0001 C CNN
+F 3 "https://store.arduino.cc/arduino-mega-2560-rev3" H 7800 8350 60  0001 C CNN
+	1    7100 5600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDD #PWR?
+U 1 1 5F16E83A
+P 3600 4800
+F 0 "#PWR?" H 3600 4550 50  0001 C CNN
+F 1 "GNDD" H 3604 4645 50  0000 C CNN
+F 2 "" H 3600 4800 50  0001 C CNN
+F 3 "" H 3600 4800 50  0001 C CNN
+	1    3600 4800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3600 4650 3600 4800
+$Comp
+L arduino:Arduino_101_Shield XA?
+U 1 1 5F1754BA
+P 10750 4500
+F 0 "XA?" H 10750 5887 60  0000 C CNN
+F 1 "Ethernet shield" H 10750 5781 60  0000 C CNN
+F 2 "" H 12550 8250 60  0001 C CNN
+F 3 "https://store.arduino.cc/genuino-101" H 12550 8250 60  0001 C CNN
+	1    10750 4500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6850 3000 6850 2350
+Wire Wire Line
+	6850 2350 12900 2350
+Wire Wire Line
+	12900 2350 12900 4750
+Wire Wire Line
+	12900 4750 12050 4750
+Wire Wire Line
+	6950 3000 6950 2400
+Wire Wire Line
+	6950 2400 12850 2400
+Wire Wire Line
+	12850 2400 12850 4850
+Wire Wire Line
+	12850 4850 12050 4850
+Wire Wire Line
+	7050 3000 7050 2450
+Wire Wire Line
+	7050 2450 12800 2450
+Wire Wire Line
+	12800 2450 12800 4950
+Wire Wire Line
+	12800 4950 12050 4950
+Wire Wire Line
+	7250 3000 7250 2500
+Wire Wire Line
+	7250 2500 12750 2500
+Wire Wire Line
+	12750 2500 12750 5150
+Wire Wire Line
+	12750 5150 12050 5150
+Wire Wire Line
+	8400 3650 8950 3650
+Wire Wire Line
+	8950 3650 8950 2650
+Wire Wire Line
+	8950 2650 12500 2650
+Wire Wire Line
+	12500 2650 12500 3650
+Wire Wire Line
+	12500 3650 12050 3650
+Wire Wire Line
+	8400 4250 9050 4250
+Wire Wire Line
+	9050 4250 9050 2700
+Wire Wire Line
+	9050 2700 12450 2700
+Wire Wire Line
+	12450 2700 12450 4250
+Wire Wire Line
+	12450 4250 12050 4250
+Wire Wire Line
+	9450 5250 8850 5250
+Wire Wire Line
+	8850 5250 8850 2650
+Wire Wire Line
+	8850 2650 5300 2650
+Wire Wire Line
+	5300 2650 5300 6550
+Wire Wire Line
+	9250 5350 9450 5350
+Wire Wire Line
+	9100 5450 9450 5450
+Wire Wire Line
+	5800 7450 5100 7450
+Wire Wire Line
+	5100 7450 5100 8400
+Wire Wire Line
+	5100 8400 9100 8400
+Wire Wire Line
+	9100 5450 9100 8400
+Wire Wire Line
+	5800 7350 5250 7350
+Wire Wire Line
+	5250 7350 5250 8300
+Wire Wire Line
+	5250 8300 9250 8300
+Wire Wire Line
+	9250 5350 9250 8300
+$Comp
+L Device:Rotary_Encoder_Switch SW?
+U 1 1 5F567401
+P 3750 6150
+F 0 "SW?" H 3750 6517 50  0000 C CNN
+F 1 "Rotary_Encoder_Switch" H 3750 6426 50  0000 C CNN
+F 2 "" H 3600 6310 50  0001 C CNN
+F 3 "~" H 3750 6410 50  0001 C CNN
+	1    3750 6150
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Sensor_Humidity:ENS210 Oled_display
+U 1 1 5F57E5DA
+P 3700 4350
+F 0 "Oled_display" H 3929 4396 50  0000 L CNN
+F 1 "SH1106" H 3929 4305 50  0000 L CNN
+F 2 "Package_DFN_QFN:AMS_QFN-4-1EP_2x2mm_P0.95mm_EP0.7x1.6mm" H 3700 3950 50  0001 C CNN
+F 3 "http://ams.com/eng/Products/Environmental-Sensors/Relative-Humidity-and-Temperature-Sensors/ENS210" H 3700 4350 50  0001 C CNN
+	1    3700 4350
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Device:R_US R?
+U 1 1 5F5976BC
+P 4900 6050
+F 0 "R?" V 4968 6096 50  0000 L CNN
+F 1 "10K" V 4968 6005 50  0000 C CNN
+F 2 "" V 4940 6040 50  0001 C CNN
+F 3 "~" H 4900 6050 50  0001 C CNN
+	1    4900 6050
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R_US R?
+U 1 1 5F59EA36
+P 4900 6250
+F 0 "R?" V 4968 6296 50  0000 L CNN
+F 1 "10K" V 4968 6205 50  0000 C CNN
+F 2 "" V 4940 6240 50  0001 C CNN
+F 3 "~" H 4900 6250 50  0001 C CNN
+	1    4900 6250
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GNDD #PWR?
+U 1 1 5F59FAC2
+P 4650 6700
+F 0 "#PWR?" H 4650 6450 50  0001 C CNN
+F 1 "GNDD" H 4654 6545 50  0000 C CNN
+F 2 "" H 4650 6700 50  0001 C CNN
+F 3 "" H 4650 6700 50  0001 C CNN
+	1    4650 6700
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C?
+U 1 1 5F59FACC
+P 4650 6450
+F 0 "C?" H 4742 6496 50  0000 L CNN
+F 1 "100n" H 4742 6405 50  0000 L CNN
+F 2 "" H 4650 6450 50  0001 C CNN
+F 3 "~" H 4650 6450 50  0001 C CNN
+	1    4650 6450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4650 6550 4650 6700
+$Comp
+L Device:C_Small C?
+U 1 1 5F5A2198
+P 4400 6450
+F 0 "C?" H 4492 6496 50  0000 L CNN
+F 1 "100n" H 4492 6405 50  0000 L CNN
+F 2 "" H 4400 6450 50  0001 C CNN
+F 3 "~" H 4400 6450 50  0001 C CNN
+	1    4400 6450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDD #PWR?
+U 1 1 5F5A6407
+P 4400 6700
+F 0 "#PWR?" H 4400 6450 50  0001 C CNN
+F 1 "GNDD" H 4404 6545 50  0000 C CNN
+F 2 "" H 4400 6700 50  0001 C CNN
+F 3 "" H 4400 6700 50  0001 C CNN
+	1    4400 6700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDD #PWR?
+U 1 1 5F5A7868
+P 4150 6700
+F 0 "#PWR?" H 4150 6450 50  0001 C CNN
+F 1 "GNDD" H 4154 6545 50  0000 C CNN
+F 2 "" H 4150 6700 50  0001 C CNN
+F 3 "" H 4150 6700 50  0001 C CNN
+	1    4150 6700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4050 6050 4400 6050
+Wire Wire Line
+	5050 6050 5800 6050
+Wire Wire Line
+	4050 6250 4650 6250
+Wire Wire Line
+	5050 6250 5400 6250
+Wire Wire Line
+	5400 6250 5400 6150
+Wire Wire Line
+	5400 6150 5800 6150
+Wire Wire Line
+	4650 6350 4650 6250
+Connection ~ 4650 6250
+Wire Wire Line
+	4650 6250 4750 6250
+Wire Wire Line
+	4400 6350 4400 6050
+Connection ~ 4400 6050
+Wire Wire Line
+	4400 6050 4750 6050
+Wire Wire Line
+	4400 6550 4400 6700
+Wire Wire Line
+	4050 6150 4150 6150
+Wire Wire Line
+	4150 6150 4150 6600
+Wire Wire Line
+	5800 6250 5550 6250
+Wire Wire Line
+	5550 6250 5550 5750
+Wire Wire Line
+	5550 5750 3250 5750
+Wire Wire Line
+	3250 5750 3250 6050
+Wire Wire Line
+	3250 6050 3450 6050
+Wire Wire Line
+	3450 6250 3250 6250
+Wire Wire Line
+	3250 6250 3250 6600
+Wire Wire Line
+	3250 6600 4150 6600
+Connection ~ 4150 6600
+Wire Wire Line
+	4150 6600 4150 6700
+Wire Wire Line
+	5800 4450 4000 4450
+Wire Wire Line
+	4000 4250 4250 4250
+Wire Wire Line
+	4250 4250 4250 4550
+Wire Wire Line
+	4250 4550 5800 4550
+Wire Wire Line
+	5300 6550 5800 6550
+Wire Wire Line
+	5100 7450 5100 5500
+Wire Wire Line
+	5100 3850 3600 3850
+Wire Wire Line
+	3600 3850 3600 4050
+Connection ~ 5100 7450
+$Comp
+L Device:R_US R?
+U 1 1 5F5E0E35
+P 4900 5500
+F 0 "R?" V 4968 5546 50  0000 L CNN
+F 1 "10K" V 4968 5455 50  0000 C CNN
+F 2 "" V 4940 5490 50  0001 C CNN
+F 3 "~" H 4900 5500 50  0001 C CNN
+	1    4900 5500
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	5050 5500 5100 5500
+Connection ~ 5100 5500
+Wire Wire Line
+	5100 5500 5100 3850
+Wire Wire Line
+	4750 5500 3250 5500
+Wire Wire Line
+	3250 5500 3250 5750
+Connection ~ 3250 5750
+$EndSCHEMATC

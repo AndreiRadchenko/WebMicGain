@@ -31,9 +31,12 @@ EthernetClient client;
 
 using namespace Menu;
 
-int ccu=1; //current ccu number
+int ccu=1;
 int ch1=1; //gain value: 0 = -20 dB; 1 = -30 db; ... 4 = -60 db;
 int ch2=2;
+
+#define _CH1 1
+#define _CH2 2
 
 struct config_mic
 {
@@ -45,16 +48,16 @@ char ccu_name[16][16];    //string array for ccu names. names length is 16 char
 #define LEDPIN LED_BUILTIN
 #define __AVR_ATmega2560__
 
-#define DEBAG
+#define DEBUG
 
 // #define USE_PCD8544
 #define USE_SSD1306
 
 #if defined(USE_SSD1306)
   // rotary encoder pins
-   #define encA    62
-   #define encB    63
-   #define encBtn  61
+   #define encA    67 //62
+   #define encB    68 //63
+   #define encBtn  69 //61
 
   #include <Wire.h>
   //#define fontName u8g2_font_7x13_mf
@@ -68,10 +71,16 @@ char ccu_name[16][16];    //string array for ccu names. names length is 16 char
   #define U8_Width 128
   #define U8_Height 64
   #define USE_HWI2C
-  U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);//, SCL, SDA);
-  // U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R2, U8X8_PIN_NONE, 4, 5);
-  // U8G2_SSD1306_128X64_VCOMH0_F_HW_I2C u8g2(U8G2_R2, U8X8_PIN_NONE, 4, 5);
-  // U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, 4, 5);
+  //U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, SCL, SDA); //display with yellow stripe
+  //U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+  //U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);//, SCL, SDA);
+  U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, SCL, SDA);
+  //U8G2_SSD1306_128X64_VCOMH0_F_HW_I2C u8g2(U8G2_R2, U8X8_PIN_NONE, 4, 5);
+  //U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, 6, 7);
+  //U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+  //U8G2_SH1106_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+  //U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, /* clock=*/ 5, /* data=*/ 6, /* reset=*/ U8X8_PIN_NONE);
+  //U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, /* clock=*/ SCL, /* data=*/ SDA, /* reset=*/ U8X8_PIN_NONE);
 #else
   #error DEFINE YOUR OUTPUT HERE.
 #endif
@@ -89,39 +98,16 @@ struct config_t
     unsigned int webserverPort;
 } eeprom_config;
 
-/** 
-* set_mic_default() function
-*
-* The default settings. 
-* This settings are used when no config is present.
-*/
-void set_mic_default()
-{
-  int i, j;
-  char buf[20];
-  char* num; 
-  
-  cfg.mic_config_set = 1; // dont change! It's used to check if the config is already set
-  
-  for (j = 0; j <= 15; j++)
-  {
-    strcpy(cfg.ccu_name[j], "CCU");
-    num = itoa(j+1,buf,10);
-    strcat(cfg.ccu_name[j], num);
-    //strcat(cfg.ccu_name[j], '\0');
-  }; 
-  // global unsigned char ccu_ch[32];
-  for (i = 0; i <= 31; i++)
-  {
-    cfg.ccu_ch[i] = 2; //-40dB потом инициализация будет значениями из EEPROM
-  };
-}
+result doAlert(eventMask e, prompt &item);
+
+int test=55;
+
+int ledCtrl=HIGH;
 
 // define menu colors --------------------------------------------------------
 //each color is in the format:
 //  {{disabled normal,disabled selected},{enabled normal,enabled selected, enabled editing}}
 // this is a monochromatic color table
-/*
 const colorDef<uint8_t> colors[6] MEMMODE={
   {{0,0},{0,1,1}},//bgColor
   {{1,1},{1,0,0}},//fgColor
@@ -130,28 +116,50 @@ const colorDef<uint8_t> colors[6] MEMMODE={
   {{0,1},{0,0,1}},//cursorColor
   {{1,1},{1,0,0}},//titleColor
 };
-*/
-const colorDef<uint8_t> colors[6] MEMMODE={
-  {{0,0},{0,1,1}},//bgColor
-  {{1,1},{1,0,0}},//fgColor
-  {{1,1},{1,0,0}},//valColor
-  {{1,1},{1,0,0}},//unitColor
-  {{0,1},{0,0,1}},//cursorColor
-  {{0,1},{1,0,0}},//titleColor
-};
 
-result doAlert(eventMask e, prompt &item);
+result setGainCh1(eventMask e,navNode& nav,prompt& item)
+{
+  //setGainHttpRequest(CH1, ch1);
+  switch(e) {
+    case enterEvent://entering navigation level (this menu is now active)
+      //Serial.println(" enterEvent");
+      //nav.root->showTitle = true;
+      break;
+    case exitEvent://leaving navigation level
+      //Serial.println(" exitEvent");
+      //nav.root->showTitle = false; //nav.selected()
+      //idx_t n=nav.root->path[nav.root->level-1].sel;
+      //idx_t n=nav.root->path[nav.root->level+1].sel;
+      setGainHttpRequest(_CH1, ch1);
+      //Serial.println("nav.node().sel: ");
+      //Serial.println(n);
 
-int test=55;
-
-int ledCtrl=HIGH;
-
-result myLedOn() {
-  ledCtrl=HIGH;
+      //selCH1[1]
+      break;
+  }
   return proceed;
 }
-result myLedOff() {
-  ledCtrl=LOW;
+
+result setGainCh2(eventMask e,navNode& nav,prompt& item)
+{
+  //setGainHttpRequest(CH2, ch2);
+  switch(e) {
+    case enterEvent://entering navigation level (this menu is now active)
+      //Serial.println(" enterEvent");
+      //nav.root->showTitle = true;
+      break;
+    case exitEvent://leaving navigation level
+      //Serial.println(" exitEvent");
+      //nav.root->showTitle = false; //nav.selected()
+      //idx_t n=nav.root->path[nav.root->level-1].sel;
+      //idx_t n=nav.root->path[nav.root->level+1].sel;
+      setGainHttpRequest(_CH2, ch2);
+      //Serial.println("nav.node().sel: ");
+      //Serial.println(n);
+
+      //selCH1[1]
+      break;
+  }
   return proceed;
 }
 
@@ -247,11 +255,6 @@ result saveDeviceAddr(eventMask e,navNode& nav,prompt& item)
   return proceed;
 }
 
-TOGGLE(ledCtrl,setLed,"Led: ",doNothing,noEvent,noStyle//,doExit,enterEvent,noStyle
-  ,VALUE("On",HIGH,doNothing,noEvent)
-  ,VALUE("Off",LOW,doNothing,noEvent)
-);
-
 SELECT(ccu,selCCU," CCU ",ccuGetParam,exitEvent | enterEvent,noStyle
 //SELECT(ccu,selCCU," CCU ",doNothing,noEvent,noStyle
   ,VALUE("CAM1",1,doNothing,noEvent)
@@ -270,27 +273,11 @@ SELECT(ccu,selCCU," CCU ",ccuGetParam,exitEvent | enterEvent,noStyle
   ,VALUE("CAM14",14,doNothing,noEvent)
   ,VALUE("CAM15",15,doNothing,noEvent)
   ,VALUE("CAM16",16,doNothing,noEvent)  
- /*  ,VALUE(cfg.ccu_name[0],1,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[1],2,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[2],3,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[3],4,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[4],5,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[5],6,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[6],7,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[7],8,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[8],9,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[9],10,doNothing,noEvent)  
-  ,VALUE(cfg.ccu_name[10],11,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[11],12,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[12],13,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[13],14,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[14],15,doNothing,noEvent)
-  ,VALUE(cfg.ccu_name[15],16,doNothing,noEvent) */
 );
 
-//int ch1=1;
-//SELECT(ch1,selCH1," CH1 ",ccuSetGainCH1,exitEvent,noStyle
-SELECT(ch1,selCH1," CH1 ",doNothing,noEvent,noStyle
+//int ch1=1; setGainCh1
+//SELECT(ch1,selCH1," CH1 ",doNothing,noEvent,noStyle
+SELECT(ch1,selCH1," CH1 ",setGainCh1,exitEvent | enterEvent,noStyle
   ,VALUE("-20 dB",0,doNothing,noEvent)
   ,VALUE("-30 dB",1,doNothing,noEvent)
   ,VALUE("-40 dB",2,doNothing,noEvent)
@@ -299,8 +286,8 @@ SELECT(ch1,selCH1," CH1 ",doNothing,noEvent,noStyle
 );
 
 //int ch2=3;
-//SELECT(ch2,selCH2," CH2 ",ccuSetGainCH2,exitEvent,noStyle
-SELECT(ch2,selCH2," CH2 ",doNothing,noEvent,noStyle
+//SELECT(ch2,selCH2," CH2 ",doNothing,noEvent,noStyle
+SELECT(ch2,selCH2," CH2 ",setGainCh2,exitEvent | enterEvent,noStyle
   ,VALUE("-20 dB",0,doNothing,noEvent)
   ,VALUE("-30 dB",1,doNothing,noEvent)
   ,VALUE("-40 dB",2,doNothing,noEvent)
@@ -333,10 +320,6 @@ MENU(ctrlMenu,"Mic Control",doNothing,noEvent,wrapStyle
   ,SUBMENU(selCH1)
   ,SUBMENU(selCH2)
 );
-
-char* constMEM hexDigit MEMMODE="0123456789ABCDEF";
-char* constMEM hexNr[] MEMMODE={"0","x",hexDigit,hexDigit};
-char buf1[]="0x11";
 
 MENU(mainMenu,"",doNothing,noEvent,wrapStyle
   ,SUBMENU(ctrlMenu)
@@ -393,8 +376,8 @@ MENU_INPUTS(in,&encStream,&encButton);//,&serial);
 
 MENU_OUTPUTS(out,MAX_DEPTH
   ,U8G2_OUT(u8g2,colors,fontX,fontY,offsetX,offsetY,{0,0,U8_Width/fontX,U8_Height/fontY})
-  ,NONE
-  //,SERIAL_OUT(Serial)
+  //,NONE
+  ,SERIAL_OUT(Serial)
 );
 
 NAVROOT(nav,mainMenu,MAX_DEPTH,in,out);
@@ -429,20 +412,29 @@ result idle(menuOut& o,idleEvent e) {
 
 void setup() {
 
-  set_mic_default();
+  //set_mic_default();
 
-  #ifdef DEBAG
+  #ifdef DEBUG
     Serial.begin(115200);
     while(!Serial);
     Serial.println("menu 4.x test");Serial.flush();
   #endif
 
+  //pinMode(encBtn, INPUT_PULLUP);
+
   setupNetwork();
 
   encButton.begin();
+    #ifdef DEBUG
+    //Serial.print("PostData: ");
+    Serial.println("encButton.begin()..");
+    #endif 
   encoder.begin();
+    Serial.println("encoder.begin()..");
   Wire.begin();
+    Serial.println("Wire.begin()..");
   u8g2.begin();
+    Serial.println("u8g2.begin()..");
 
   u8g2.setFont(fontName);
   // u8g2.setBitmapMode(0);
@@ -455,17 +447,19 @@ void setup() {
     Serial.println("setup done.");Serial.flush();
   #endif
   //nav.doNav(navCmd(idxCmd,0)); //hilite first option
-  nav.doNav(navCmd(enterCmd)); //execute option
+  nav.doNav(navCmd(enterCmd)); //execute option for entering Mic Control menu at startup
+  //ccuGetParamHttpRequest(0);
 }
 
 void loop() {
   nav.doInput();
-   digitalWrite(LEDPIN, ledCtrl);
+  // digitalWrite(LEDPIN, ledCtrl);
   if (nav.changed(0)) {//only draw if menu changed for gfx device
     //change checking leaves more time for other tasks
     u8g2.firstPage();
     do nav.doOutput(); while(u8g2.nextPage());
   }
+  //nav.poll();
   //delay(100);//simulate other tasks delay
   //readWebResponce();
 }

@@ -2,7 +2,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "MyNetSetup.h"
-#include "pcint.h"
+//#include "pcint.h"
 
 #define EEPROM_ETHER 0
 #define EEPROM_SET 50
@@ -10,7 +10,7 @@
 #define EEPROM_CCU_NAME 100
 
 // Power-Down Add-On Hardware
-const byte interruptPin = 19; //D19
+//const byte interruptPin = 69; //D19
 
 // no-cost stream operator as described at 
 // http://sundial.org/arduino/?page_id=119
@@ -101,6 +101,16 @@ void outputPins(WebServer &server, WebServer::ConnectionType type, bool addContr
         "xhr.setRequestHeader('Content-Type', 'text-plain');"
         "xhr.send(body);" 
         "window.alert('Mic Settings are Saved');"        
+     "}"
+
+     "function set_param()" 
+     "{"
+        "var body = 'param' + '=' + 'set';"       
+        "xhr.open('POST', '" PREFIX "/setParam', true);"
+        "xhr.setRequestHeader('Content-Type', 'text-plain');"
+        "xhr.send(body);"
+        "window.alert('Microphones level being setted\\. It\\'s take 5 seconds\\..');"  
+        //"window.alert('Mic's level being setted. It's take 5 seconds');"        
      "}"
      
     "</script>"   
@@ -331,7 +341,8 @@ void outputPins(WebServer &server, WebServer::ConnectionType type, bool addContr
   server << "</tr>";
   server << "</table>";// <p> <br> </p>";
   server << "</form>";
-  server << "<p> <br> <br> <br> <input type='submit' name='button' value='Save Settings'  onClick=\"save_param()\"> </p>";
+  server << "<p> <br> <br> <br> <input type='submit' name='button' value='Save Settings'  onClick=\"save_param()\">";// </p>"; 
+  server << " <input type='submit' name='button2' value='Set All Microphones'  onClick=\"set_param()\"> </p>";
   server << "<p> <br> <br> <br> <br> <br> <br> <br> <br> <a href=\"setupNet.html\">NETWORK SETUP</a> </p>";
  
   
@@ -772,9 +783,36 @@ void saveParamCmd(WebServer &server, WebServer::ConnectionType type, char *url_t
      EEPROM_writeAnything(EEPROM_SET, cfg);
 };
 
-void saveParam()
+/* void saveParam()
 {  
+     #ifdef DEBUG    
+         Serial.println("Save param on turn off");   
+     #endif 
      EEPROM_writeAnything(EEPROM_SET, cfg);
+     PCdetachInterrupt<interruptPin>();
+}; */
+
+void setParamCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) 
+{
+  gain_change_ccu(CCU1_out, cfg.ccu_ch[0], cfg.ccu_ch[1]);
+  gain_change_ccu(CCU2_out, cfg.ccu_ch[2], cfg.ccu_ch[3]);
+  gain_change_ccu(CCU3_out, cfg.ccu_ch[4], cfg.ccu_ch[5]);  
+  gain_change_ccu(CCU4_out, cfg.ccu_ch[6], cfg.ccu_ch[7]); 
+  gain_change_ccu(CCU5_out, cfg.ccu_ch[8], cfg.ccu_ch[9]); 
+  gain_change_ccu(CCU6_out, cfg.ccu_ch[10], cfg.ccu_ch[11]);
+  gain_change_ccu(CCU7_out, cfg.ccu_ch[12], cfg.ccu_ch[13]);
+  gain_change_ccu(CCU8_out, cfg.ccu_ch[14], cfg.ccu_ch[15]);
+  gain_change_ccu(CCU9_out, cfg.ccu_ch[16], cfg.ccu_ch[17]);
+  gain_change_ccu(CCU10_out, cfg.ccu_ch[18], cfg.ccu_ch[19]);
+  ccu_gain_transmit(CCU11, cfg.ccu_ch[20], cfg.ccu_ch[21]);
+  ccu_gain_transmit(CCU12, cfg.ccu_ch[22], cfg.ccu_ch[23]);
+  ccu_gain_transmit(CCU13, cfg.ccu_ch[24], cfg.ccu_ch[25]);
+  ccu_gain_transmit(CCU14, cfg.ccu_ch[26], cfg.ccu_ch[27]);
+  ccu_gain_transmit(CCU15, cfg.ccu_ch[28], cfg.ccu_ch[29]);
+  ccu_gain_transmit(CCU16, cfg.ccu_ch[30], cfg.ccu_ch[31]);
+  #ifdef DEBUG
+      Serial.println("All mics are setted");
+  #endif    
 };
 
 void defaultCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
@@ -807,6 +845,9 @@ void set_mic_default()
   {
     cfg.ccu_ch[i] = 2; //-40dB потом инициализация будет значениями из EEPROM
   };
+  #ifdef DEBUG
+      Serial.println("set_mic_default()..");
+  #endif 
 }
 
 /**
@@ -820,6 +861,7 @@ void set_mic_default()
 void read_mic_settings() 
 { 
   // read the current config
+  //Serial.println("reading mic setting");
   EEPROM_readAnything(EEPROM_SET, cfg);
   
   // check if config is present or if reset button is pressed
@@ -829,14 +871,17 @@ void read_mic_settings()
     set_mic_default();   
     // write the config to eeprom
     EEPROM_writeAnything(EEPROM_SET, cfg);
-  } 
+  }
+  //Serial.println("exit reading mic setting"); 
 }
 
 void setup()
 {
   pinMode(RESET_PIN, INPUT);
   digitalWrite(RESET_PIN, HIGH); //5 pin pull down during startup for reset to default
-  pinMode(interruptPin, INPUT_PULLUP);
+  //pinMode(interruptPin, INPUT_PULLUP);
+
+  //PCdetachInterrupt<interruptPin>();
 
   Serial.begin(SERIAL_BAUD);
   Wire.begin(); // join i2c bus (address optional for master)
@@ -846,7 +891,7 @@ void setup()
   // set pins for digital outputs
   read_mic_settings(); 
   
-//  set_mic_default();
+  //set_mic_default();
   
   //delay(500);
   //set out pins to saved value
@@ -882,7 +927,8 @@ void setup()
   webserver->setDefaultCommand(&defaultCmd);
   webserver->addCommand("form", &formCmd);  
   webserver->addCommand("ccuName", &ccuNameCmd); 
-  webserver->addCommand("saveParam", &saveParamCmd);   
+  webserver->addCommand("saveParam", &saveParamCmd);
+  webserver->addCommand("setParam", &setParamCmd);    
   webserver->addCommand("ccuGetParam", &ccuGetParamCmd);
    /* setup our default command that will be run when the user accesses
    * a page NOT on the server */
@@ -893,7 +939,8 @@ void setup()
   /* start the webserver */
   webserver->begin(); 
   //delay(200); // some time to settle
-  attachInterrupt(digitalPinToInterrupt(interruptPin), saveParam, FALLING); // ISR for power down detect
+  //attachInterrupt(digitalPinToInterrupt(interruptPin), saveParam, FALLING); // ISR for power down detect
+  //PCattachInterrupt<interruptPin>(saveParam, FALLING);
 
 };
 
