@@ -407,6 +407,8 @@ void setup() {
     Serial.println("menu 4.x test");Serial.flush();
   #endif
 
+  //pinMode(encBtn, INPUT_PULLUP);
+
   setupNetwork();
 
   encButton.begin();
